@@ -52,7 +52,7 @@ export default function Home() {
       <div className="w-full max-w-2xl">
         <h1 className="text-3xl font-bold tracking-tight mb-2">LeaseCheck</h1>
         <p className="text-gray-500 mb-10 text-sm">
-          Upload your rental contract and get a plain-English breakdown of potential issues.
+          Upload your rental contract to get a quick pre-check.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -146,6 +146,9 @@ export default function Home() {
           </div>
         )}
       </div>
+      <p className="mt-16 text-xs text-gray-400">
+        This is an automated analysis, not legal advice.
+      </p>
     </main>
   );
 }
