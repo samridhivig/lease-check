@@ -3,6 +3,12 @@
 import { useState, useRef } from 'react';
 import type { AnalysisResult, ExtractionMeta } from '@/types';
 
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 type TranslationResult = {
   detectedLanguage: string;
   detectedLanguageCode: string;
@@ -216,6 +222,8 @@ export default function Home() {
     setLoading(true);
     setError(null);
     setResult(null);
+
+    window.gtag?.('event', 'analyze_contract');
 
     try {
       const analysisResponse = await requestAnalysis(file);
