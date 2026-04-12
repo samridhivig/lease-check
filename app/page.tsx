@@ -290,6 +290,9 @@ export default function Home() {
                 <p className="text-xs text-gray-400 mt-1">
                   Rental contracts only &middot; 10 MB max
                 </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Your file is processed in memory and never stored
+                </p>
               </>
             )}
           </div>
@@ -492,9 +495,17 @@ export default function Home() {
           2019 onward, not legal advice.
         </p>
         <p>
-          Your PDF is processed in memory and never stored.{' '}
           <a href="/privacy" className="underline underline-offset-2 hover:text-gray-600">
             Privacy policy
+          </a>
+          {' · '}
+          <a
+            href="https://github.com/samridhivig/lease-check"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2 hover:text-gray-600"
+          >
+            Source code (MIT)
           </a>
         </p>
       </footer>
