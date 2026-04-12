@@ -476,10 +476,18 @@ export default function Home() {
           </div>
         )}
       </div>
-      <p className="mt-16 text-xs text-gray-400">
-        This is an automated analysis for Flemish residential leases signed from 1 January
-        2019 onward, not legal advice.
-      </p>
+      <footer className="mt-16 text-xs text-gray-400 text-center space-y-1">
+        <p>
+          This is an automated analysis for Flemish residential leases signed from 1 January
+          2019 onward, not legal advice.
+        </p>
+        <p>
+          Your PDF is processed in memory and never stored.{' '}
+          <a href="/privacy" className="underline underline-offset-2 hover:text-gray-600">
+            Privacy policy
+          </a>
+        </p>
+      </footer>
     </main>
   );
 }
