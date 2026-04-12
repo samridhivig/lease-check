@@ -240,6 +240,8 @@ export default function Home() {
   async function handleTranslateOnly() {
     if (!file) return;
 
+    window.gtag?.('event', 'translate_contract');
+
     setLoading(true);
     setTranslation(null);
     setTranslationError(null);
