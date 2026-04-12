@@ -23,8 +23,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to parse PDF' }, { status: 422 });
   }
 
-  const fields = extractFields(text);
-  const flags = runRules(fields);
+  const extractionInput = {
+    text,
+    fileName: 'name' in file && typeof file.name === 'string' ? file.name : undefined,
+    mimeType: file.type || 'application/pdf',
+  };
+
+  const extraction = extractFields(extractionInput, {
+    schema: 'be-flanders-residential-v1',
+    country: 'BE',
+    region: 'FLANDERS',
+    returnEvidence: true,
+    strictness: 'balanced',
+  });
+
+  const flags = runRules(extraction);
   const explanations = mapExplanations(flags);
 
   const result: AnalysisResult = {
