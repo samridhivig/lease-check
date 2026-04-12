@@ -178,7 +178,6 @@ export default function Home() {
   const [fieldsOpen, setFieldsOpen] = useState(false);
   const [showFieldDetails, setShowFieldDetails] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [translateDocument, setTranslateDocument] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [translationError, setTranslationError] = useState<string | null>(null);
@@ -216,39 +215,15 @@ export default function Home() {
 
     setLoading(true);
     setError(null);
-    setTranslationError(null);
     setResult(null);
-    setTranslation(null);
 
     try {
-      const [analysisResponse, translationResponse] = await Promise.allSettled([
-        requestAnalysis(file),
-        translateDocument ? requestTranslation(file) : Promise.resolve(null),
-      ]);
-
-      if (analysisResponse.status === 'fulfilled') {
-        setResult(analysisResponse.value);
-      } else {
-        setError(
-          analysisResponse.reason instanceof Error
-            ? analysisResponse.reason.message
-            : 'Something went wrong',
-        );
-      }
-
-      if (!translateDocument) {
-        return;
-      }
-
-      if (translationResponse.status === 'fulfilled') {
-        setTranslation(translationResponse.value);
-      } else {
-        setTranslationError(
-          translationResponse.reason instanceof Error
-            ? translationResponse.reason.message
-            : 'Translation failed',
-        );
-      }
+      const analysisResponse = await requestAnalysis(file);
+      setResult(analysisResponse);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Something went wrong',
+      );
     } finally {
       setLoading(false);
     }
@@ -309,31 +284,6 @@ export default function Home() {
             )}
           </div>
 
-          <label className="flex items-start gap-3 rounded-lg border border-gray-200 p-4 text-sm">
-            <input
-              type="checkbox"
-              checked={translateDocument}
-              onChange={(e) => setTranslateDocument(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-gray-300"
-            />
-            <span className="space-y-1">
-              <span className="block font-medium text-gray-800">
-                Translate Dutch documents to English
-              </span>
-              <span className="block text-gray-500">
-                Detection runs automatically. Only Dutch files are translated for now, and
-                analysis still uses the original document.
-              </span>
-            </span>
-          </label>
-
-          {translateDocument && (
-            <p className="text-xs text-gray-500">
-              The first translation can take a bit longer while the model downloads and
-              warms up.
-            </p>
-          )}
-
           <div className="grid gap-3 sm:grid-cols-2">
             <button
               type="submit"
@@ -349,7 +299,7 @@ export default function Home() {
               onClick={handleTranslateOnly}
               className="w-full border border-gray-300 text-gray-800 rounded-lg py-3 text-sm font-medium disabled:opacity-40 hover:border-gray-400 transition-colors"
             >
-              {loading ? 'Processing\u2026' : 'Translate Document'}
+              {loading ? 'Processing\u2026' : 'Translate to English'}
             </button>
           </div>
         </form>
