@@ -6,7 +6,7 @@ import { rateLimiter } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_FILE_SIZE = 4.5 * 1024 * 1024; // 4.5 MB
 
 function getClientIp(req: NextRequest): string {
   return (
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
   if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json(
-      { error: 'File exceeds the 10 MB size limit.' },
+      { error: 'File exceeds the 4.5 MB size limit.' },
       { status: 413 },
     );
   }

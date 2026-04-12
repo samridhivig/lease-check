@@ -55,7 +55,7 @@ function formatFieldId(id: string): string {
 
 async function parseErrorResponse(res: Response): Promise<string> {
   if (res.status === 413) {
-    return 'This file is too large. The maximum size is 10 MB.';
+    return 'This file is too large. The maximum size is 4.5 MB.';
   }
   if (res.status === 429) {
     return 'You are sending requests too quickly. Please wait a moment and try again.';
@@ -147,7 +147,7 @@ function ExtractionSummary({
         </button>
 
         {showFieldDetails && (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm pt-2 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm pt-2 border-t border-gray-100">
             {extraction.fieldCoverage.map((field) => (
               <div key={field.fieldId} className="flex items-center gap-2 py-0.5">
                 <span
@@ -288,7 +288,7 @@ export default function Home() {
               <>
                 <p className="text-sm text-gray-500">Click to select a PDF</p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Rental contracts only &middot; 10 MB max
+                  Rental contracts only &middot; 4.5 MB max
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
                   Your file is processed in memory and never stored
@@ -393,7 +393,7 @@ export default function Home() {
                 </button>
 
                 {fieldsOpen && (
-                  <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg border border-gray-200 bg-white p-4 text-sm">
+                  <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 rounded-lg border border-gray-200 bg-white p-4 text-sm">
                     {result.extractedFields.map((field) => (
                       <div
                         key={field.label}
