@@ -21,11 +21,28 @@ export interface ExtractedFieldSummary {
   confidence: number;
 }
 
+export interface FieldCoverageEntry {
+  fieldId: LeaseFieldId;
+  status: ExtractedFieldStatus;
+  confidence: number;
+}
+
+export interface ExtractionMeta {
+  documentTypeConfidence: number;
+  detectedLanguage: SupportedDocumentLanguage;
+  totalFields: number;
+  foundFields: number;
+  missingFields: LeaseFieldId[];
+  fieldCoverage: FieldCoverageEntry[];
+  warnings: string[];
+}
+
 export interface AnalysisResult {
   summary: string;
   flags: Flag[];
   explanations: Explanation[];
   extractedFields: ExtractedFieldSummary[];
+  extraction: ExtractionMeta;
 }
 
 export interface RuleSource {

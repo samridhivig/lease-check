@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import type { AnalysisResult } from '@/types';
+import type { AnalysisResult, ExtractionMeta } from '@/types';
 
 type TranslationResult = {
   detectedLanguage: string;
@@ -22,8 +22,161 @@ const SEVERITY_BADGE: Record<string, string> = {
   low: 'bg-blue-100 text-blue-700',
 };
 
+const STATUS_DOT: Record<string, string> = {
+  found: 'bg-green-500',
+  derived: 'bg-blue-400',
+  missing: 'bg-gray-300',
+  ambiguous: 'bg-yellow-500',
+};
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  nl: 'Dutch',
+  fr: 'French',
+  en: 'English',
+  unknown: 'Unknown',
+};
+
+function formatFieldId(id: string): string {
+  return id
+    .split('.')
+    .map((part, i) =>
+      i === 0
+        ? part.charAt(0).toUpperCase() + part.slice(1)
+        : part.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
+    )
+    .join(': ');
+}
+
+async function parseErrorResponse(res: Response): Promise<string> {
+  if (res.status === 413) {
+    return 'This file is too large. The maximum size is 10 MB.';
+  }
+  if (res.status === 429) {
+    return 'You are sending requests too quickly. Please wait a moment and try again.';
+  }
+  try {
+    const json = await res.json();
+    return json.error ?? 'Unexpected error';
+  } catch {
+    return 'Unexpected error';
+  }
+}
+
+function ScopeWarning({ extraction }: { extraction: ExtractionMeta }) {
+  if (extraction.documentTypeConfidence >= 0.55) return null;
+
+  if (extraction.documentTypeConfidence < 0.35) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+        <p className="font-medium">This does not appear to be a residential lease</p>
+        <p className="mt-1">
+          The document matched very few lease-related keywords. The analysis below may not
+          be relevant to your document.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+      <p className="font-medium">Low confidence that this is a residential lease</p>
+      <p className="mt-1">
+        Some lease-related terms were found, but fewer than expected. Results should be
+        reviewed carefully.
+      </p>
+    </div>
+  );
+}
+
+function ExtractionSummary({
+  extraction,
+  showFieldDetails,
+  onToggleDetails,
+}: {
+  extraction: ExtractionMeta;
+  showFieldDetails: boolean;
+  onToggleDetails: () => void;
+}) {
+  const coveragePercent = Math.round(
+    (extraction.foundFields / extraction.totalFields) * 100,
+  );
+
+  return (
+    <section className="space-y-3">
+      <h2 className="text-lg font-semibold">Extraction Summary</h2>
+      <div className="rounded-lg border border-gray-200 bg-white p-4 text-sm space-y-3">
+        <div className="flex justify-between">
+          <span className="text-gray-500">Detected language</span>
+          <span className="font-medium text-gray-800">
+            {LANGUAGE_LABELS[extraction.detectedLanguage] ?? extraction.detectedLanguage}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500">Document confidence</span>
+          <span className="font-medium text-gray-800">
+            {Math.round(extraction.documentTypeConfidence * 100)}%
+          </span>
+        </div>
+        <div>
+          <div className="flex justify-between mb-1">
+            <span className="text-gray-500">Fields extracted</span>
+            <span className="font-medium text-gray-800">
+              {extraction.foundFields} of {extraction.totalFields}
+            </span>
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full transition-all"
+              style={{ width: `${coveragePercent}%` }}
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={onToggleDetails}
+          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+        >
+          {showFieldDetails ? 'Hide field details' : 'Show field details'}
+        </button>
+
+        {showFieldDetails && (
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm pt-2 border-t border-gray-100">
+            {extraction.fieldCoverage.map((field) => (
+              <div key={field.fieldId} className="flex items-center gap-2 py-0.5">
+                <span
+                  className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[field.status] ?? 'bg-gray-300'}`}
+                />
+                <span
+                  className={
+                    field.status === 'missing' ? 'text-gray-400' : 'text-gray-700'
+                  }
+                >
+                  {formatFieldId(field.fieldId)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {extraction.warnings.length > 0 && (
+        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+          <p className="font-medium mb-1">Warnings</p>
+          <ul className="list-disc list-inside space-y-0.5">
+            {extraction.warnings.map((w, i) => (
+              <li key={i}>{w}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function Home() {
   const [fieldsOpen, setFieldsOpen] = useState(false);
+  const [showFieldDetails, setShowFieldDetails] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [translateDocument, setTranslateDocument] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,8 +192,7 @@ export default function Home() {
 
     const res = await fetch('/api/analyze', { method: 'POST', body });
     if (!res.ok) {
-      const json = await res.json();
-      throw new Error(json.error ?? 'Unexpected error');
+      throw new Error(await parseErrorResponse(res));
     }
 
     return (await res.json()) as AnalysisResult;
@@ -52,8 +204,7 @@ export default function Home() {
 
     const res = await fetch('/api/translate', { method: 'POST', body });
     if (!res.ok) {
-      const json = await res.json();
-      throw new Error(json.error ?? 'Unexpected error');
+      throw new Error(await parseErrorResponse(res));
     }
 
     return (await res.json()) as TranslationResult;
@@ -81,7 +232,7 @@ export default function Home() {
         setError(
           analysisResponse.reason instanceof Error
             ? analysisResponse.reason.message
-            : 'Something went wrong'
+            : 'Something went wrong',
         );
       }
 
@@ -95,7 +246,7 @@ export default function Home() {
         setTranslationError(
           translationResponse.reason instanceof Error
             ? translationResponse.reason.message
-            : 'Translation failed'
+            : 'Translation failed',
         );
       }
     } finally {
@@ -151,7 +302,9 @@ export default function Home() {
             ) : (
               <>
                 <p className="text-sm text-gray-500">Click to select a PDF</p>
-                <p className="text-xs text-gray-400 mt-1">Rental contracts only</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Rental contracts only &middot; 10 MB max
+                </p>
               </>
             )}
           </div>
@@ -176,7 +329,8 @@ export default function Home() {
 
           {translateDocument && (
             <p className="text-xs text-gray-500">
-              The first translation can take a bit longer while the model downloads and warms up.
+              The first translation can take a bit longer while the model downloads and
+              warms up.
             </p>
           )}
 
@@ -186,7 +340,7 @@ export default function Home() {
               disabled={!file || loading}
               className="w-full bg-gray-900 text-white rounded-lg py-3 text-sm font-medium disabled:opacity-40 hover:bg-gray-700 transition-colors"
             >
-              {loading ? 'Processing…' : 'Analyze Contract'}
+              {loading ? 'Processing\u2026' : 'Analyze Contract'}
             </button>
 
             <button
@@ -195,7 +349,7 @@ export default function Home() {
               onClick={handleTranslateOnly}
               className="w-full border border-gray-300 text-gray-800 rounded-lg py-3 text-sm font-medium disabled:opacity-40 hover:border-gray-400 transition-colors"
             >
-              {loading ? 'Processing…' : 'Translate Document'}
+              {loading ? 'Processing\u2026' : 'Translate Document'}
             </button>
           </div>
         </form>
@@ -231,7 +385,8 @@ export default function Home() {
             ) : (
               <div className="rounded-xl border border-gray-200 bg-white p-4">
                 <p className="mb-3 text-sm text-gray-500">
-                  English translation preview. Analysis has not been changed to use this text yet.
+                  English translation preview. Analysis has not been changed to use this
+                  text yet.
                 </p>
                 <div className="max-h-[32rem] overflow-y-auto whitespace-pre-wrap text-sm leading-6 text-gray-700">
                   {translation.translatedText}
@@ -248,6 +403,14 @@ export default function Home() {
               <p className="text-gray-600 text-sm">{result.summary}</p>
             </section>
 
+            <ScopeWarning extraction={result.extraction} />
+
+            <ExtractionSummary
+              extraction={result.extraction}
+              showFieldDetails={showFieldDetails}
+              onToggleDetails={() => setShowFieldDetails((o) => !o)}
+            />
+
             {result.extractedFields.length > 0 && (
               <section>
                 <button
@@ -255,7 +418,9 @@ export default function Home() {
                   onClick={() => setFieldsOpen((o) => !o)}
                   className="flex items-center gap-2 text-lg font-semibold hover:text-gray-600 transition-colors"
                 >
-                  <span className={`text-xs transition-transform ${fieldsOpen ? 'rotate-90' : ''}`}>
+                  <span
+                    className={`text-xs transition-transform ${fieldsOpen ? 'rotate-90' : ''}`}
+                  >
                     &#9654;
                   </span>
                   Extracted Data
@@ -267,7 +432,10 @@ export default function Home() {
                 {fieldsOpen && (
                   <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg border border-gray-200 bg-white p-4 text-sm">
                     {result.extractedFields.map((field) => (
-                      <div key={field.label} className="flex justify-between gap-2 py-1 border-b border-gray-100 last:border-0">
+                      <div
+                        key={field.label}
+                        className="flex justify-between gap-2 py-1 border-b border-gray-100 last:border-0"
+                      >
                         <span className="text-gray-500 truncate">{field.label}</span>
                         <span className="font-medium text-gray-800 text-right whitespace-nowrap">
                           {field.value}
@@ -329,7 +497,7 @@ export default function Home() {
                     <li
                       key={i}
                       className="border border-gray-200 rounded-lg p-4 text-sm bg-white"
-                      >
+                    >
                       <p className="font-medium text-gray-800 mb-1">{exp.clause}</p>
                       <p className="text-gray-600">{exp.explanation}</p>
                       {exp.uncertain && (
@@ -359,7 +527,8 @@ export default function Home() {
         )}
       </div>
       <p className="mt-16 text-xs text-gray-400">
-        This is an automated analysis for Flemish residential leases signed from 1 January 2019 onward, not legal advice.
+        This is an automated analysis for Flemish residential leases signed from 1 January
+        2019 onward, not legal advice.
       </p>
     </main>
   );
