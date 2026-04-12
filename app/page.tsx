@@ -23,6 +23,7 @@ const SEVERITY_BADGE: Record<string, string> = {
 };
 
 export default function Home() {
+  const [fieldsOpen, setFieldsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [translateDocument, setTranslateDocument] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -246,6 +247,37 @@ export default function Home() {
               <h2 className="text-lg font-semibold mb-1">Summary</h2>
               <p className="text-gray-600 text-sm">{result.summary}</p>
             </section>
+
+            {result.extractedFields.length > 0 && (
+              <section>
+                <button
+                  type="button"
+                  onClick={() => setFieldsOpen((o) => !o)}
+                  className="flex items-center gap-2 text-lg font-semibold hover:text-gray-600 transition-colors"
+                >
+                  <span className={`text-xs transition-transform ${fieldsOpen ? 'rotate-90' : ''}`}>
+                    &#9654;
+                  </span>
+                  Extracted Data
+                  <span className="text-xs font-normal text-gray-400">
+                    {result.extractedFields.length} fields
+                  </span>
+                </button>
+
+                {fieldsOpen && (
+                  <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg border border-gray-200 bg-white p-4 text-sm">
+                    {result.extractedFields.map((field) => (
+                      <div key={field.label} className="flex justify-between gap-2 py-1 border-b border-gray-100 last:border-0">
+                        <span className="text-gray-500 truncate">{field.label}</span>
+                        <span className="font-medium text-gray-800 text-right whitespace-nowrap">
+                          {field.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
 
             {result.flags.length > 0 && (
               <section>

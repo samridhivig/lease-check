@@ -15,10 +15,17 @@ export interface Explanation {
   sources: RuleSource[];
 }
 
+export interface ExtractedFieldSummary {
+  label: string;
+  value: string;
+  confidence: number;
+}
+
 export interface AnalysisResult {
   summary: string;
   flags: Flag[];
   explanations: Explanation[];
+  extractedFields: ExtractedFieldSummary[];
 }
 
 export interface RuleSource {
