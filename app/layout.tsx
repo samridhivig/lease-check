@@ -3,8 +3,20 @@ import Script from 'next/script';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'LeaseCheck — Rental Contract Analyzer',
-  description: 'Upload a rental contract and get a plain-English breakdown of potential issues.',
+  title: 'LeaseCheck — Free Flemish Rental Contract Checker',
+  description: 'Free tool to check your Flemish rental contract for issues. Compares your lease against the Woninghuurdecreet 2019 — deposit limits, notice periods, required clauses, and more.',
+  openGraph: {
+    title: 'LeaseCheck — Free Flemish Rental Contract Checker',
+    description: 'Check your Flemish rental contract against the Woninghuurdecreet 2019. Free, open source, nothing stored.',
+    url: 'https://lease-check.vercel.app',
+    siteName: 'LeaseCheck',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'LeaseCheck — Free Flemish Rental Contract Checker',
+    description: 'Check your Flemish rental contract against the Woninghuurdecreet 2019. Free, open source, nothing stored.',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -149,7 +149,7 @@ export default function Home() {
       <div className="w-full max-w-2xl">
         <h1 className="text-3xl font-bold tracking-tight mb-2">LeaseCheck</h1>
         <p className="text-gray-500 mb-10 text-sm">
-          Upload a Flanders residential lease to get a source-backed pre-check.
+          Check your Flemish rental contract against the Woninghuurdecreet 2019. Flags issues with deposits, notice periods, break fees, and required clauses.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
