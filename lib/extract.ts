@@ -845,10 +845,6 @@ export function extractFields(
     warnings.push('Layout-aware extraction was requested, but no token bounding boxes were provided.');
   }
 
-  warnings.push(
-    'Some lower-priority Flemish fields remain placeholders until the field-by-field migration is completed.',
-  );
-
   return {
     schema: options.schema,
     documentTypeConfidence: estimateDocumentTypeConfidence(text),

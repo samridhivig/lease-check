@@ -128,14 +128,14 @@ function buildSummary(
   }
 
   if (meta.foundFields < 5) {
-    return `We could only extract ${meta.foundFields} of ${meta.totalFields} fields \u2014 results may be incomplete. Review the full document with a legal professional.`;
+    return `We could only extract ${meta.foundFields} fields \u2014 results may be incomplete. Review the full document with a legal professional.`;
   }
 
   if (flags.length === 0) {
-    return `We checked ${meta.totalFields} fields and found no issues. Review the full document for any clauses not covered by automated checks.`;
+    return 'No issues found. Review the full document for any clauses not covered by automated checks.';
   }
 
-  return `Found ${flags.length} potential issue${flags.length > 1 ? 's' : ''} in your lease (checked ${meta.foundFields} of ${meta.totalFields} fields).`;
+  return `Found ${flags.length} potential issue${flags.length > 1 ? 's' : ''} in your lease.`;
 }
 
 function getClientIp(req: NextRequest): string {

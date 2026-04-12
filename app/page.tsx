@@ -28,31 +28,6 @@ const SEVERITY_BADGE: Record<string, string> = {
   low: 'bg-blue-100 text-blue-700',
 };
 
-const STATUS_DOT: Record<string, string> = {
-  found: 'bg-green-500',
-  derived: 'bg-blue-400',
-  missing: 'bg-gray-300',
-  ambiguous: 'bg-yellow-500',
-};
-
-const LANGUAGE_LABELS: Record<string, string> = {
-  nl: 'Dutch',
-  fr: 'French',
-  en: 'English',
-  unknown: 'Unknown',
-};
-
-function formatFieldId(id: string): string {
-  return id
-    .split('.')
-    .map((part, i) =>
-      i === 0
-        ? part.charAt(0).toUpperCase() + part.slice(1)
-        : part.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()),
-    )
-    .join(': ');
-}
-
 async function parseErrorResponse(res: Response): Promise<string> {
   if (res.status === 413) {
     return 'This file is too large. The maximum size is 4.5 MB.';
@@ -94,95 +69,8 @@ function ScopeWarning({ extraction }: { extraction: ExtractionMeta }) {
   );
 }
 
-function ExtractionSummary({
-  extraction,
-  showFieldDetails,
-  onToggleDetails,
-}: {
-  extraction: ExtractionMeta;
-  showFieldDetails: boolean;
-  onToggleDetails: () => void;
-}) {
-  const coveragePercent = Math.round(
-    (extraction.foundFields / extraction.totalFields) * 100,
-  );
-
-  return (
-    <section className="space-y-3">
-      <h2 className="text-lg font-semibold">Extraction Summary</h2>
-      <div className="rounded-lg border border-gray-200 bg-white p-4 text-sm space-y-3">
-        <div className="flex justify-between">
-          <span className="text-gray-500">Detected language</span>
-          <span className="font-medium text-gray-800">
-            {LANGUAGE_LABELS[extraction.detectedLanguage] ?? extraction.detectedLanguage}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-500">Document confidence</span>
-          <span className="font-medium text-gray-800">
-            {Math.round(extraction.documentTypeConfidence * 100)}%
-          </span>
-        </div>
-        <div>
-          <div className="flex justify-between mb-1">
-            <span className="text-gray-500">Fields extracted</span>
-            <span className="font-medium text-gray-800">
-              {extraction.foundFields} of {extraction.totalFields}
-            </span>
-          </div>
-          <div className="w-full bg-gray-100 rounded-full h-2">
-            <div
-              className="bg-blue-500 h-2 rounded-full transition-all"
-              style={{ width: `${coveragePercent}%` }}
-            />
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={onToggleDetails}
-          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-        >
-          {showFieldDetails ? 'Hide field details' : 'Show field details'}
-        </button>
-
-        {showFieldDetails && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm pt-2 border-t border-gray-100">
-            {extraction.fieldCoverage.map((field) => (
-              <div key={field.fieldId} className="flex items-center gap-2 py-0.5">
-                <span
-                  className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[field.status] ?? 'bg-gray-300'}`}
-                />
-                <span
-                  className={
-                    field.status === 'missing' ? 'text-gray-400' : 'text-gray-700'
-                  }
-                >
-                  {formatFieldId(field.fieldId)}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {extraction.warnings.length > 0 && (
-        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-          <p className="font-medium mb-1">Warnings</p>
-          <ul className="list-disc list-inside space-y-0.5">
-            {extraction.warnings.map((w, i) => (
-              <li key={i}>{w}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </section>
-  );
-}
-
 export default function Home() {
   const [fieldsOpen, setFieldsOpen] = useState(false);
-  const [showFieldDetails, setShowFieldDetails] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -367,12 +255,6 @@ export default function Home() {
             </section>
 
             <ScopeWarning extraction={result.extraction} />
-
-            <ExtractionSummary
-              extraction={result.extraction}
-              showFieldDetails={showFieldDetails}
-              onToggleDetails={() => setShowFieldDetails((o) => !o)}
-            />
 
             {result.extractedFields.length > 0 && (
               <section>
