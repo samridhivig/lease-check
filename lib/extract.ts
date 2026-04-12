@@ -215,7 +215,7 @@ function captureDurationClauses(text: string): ParsedDurationClause[] {
       actor: 'tenant',
       kind: 'notice',
       regex:
-        /(?:huurder|tenant|locataire).{0,120}?(?:opzeg(?:ging)?(?:stermijn)?|notice|preavis).{0,40}?(anderhalve maand|een halve maand|\d+(?:[.,]\d+)?\s*(?:maanden?|months?|mois|dagen?|days?|jours?))/gi,
+        /(?:\bhuurder|\btenant|\blocataire).{0,120}?(?:opzeg(?:ging)?(?:stermijn)?|notice|preavis).{0,40}?(anderhalve maand|een halve maand|\d+(?:[.,]\d+)?\s*(?:maanden?|months?|mois|dagen?|days?|jours?))/gi,
     },
     {
       actor: 'landlord',
@@ -227,7 +227,7 @@ function captureDurationClauses(text: string): ParsedDurationClause[] {
       actor: 'tenant',
       kind: 'fee',
       regex:
-        /(?:huurder|tenant|locataire).{0,140}?(?:opzeggingsvergoeding|vergoeding|indemnit[eé]|penalt(?:y|ies)|fee).{0,40}?(anderhalve maand|een halve maand|un mois et demi|demi-?mois|\d+(?:[.,]\d+)?\s*(?:maanden?|months?|mois))/gi,
+        /(?:\bhuurder|\btenant|\blocataire).{0,140}?(?:opzeggingsvergoeding|vergoeding|indemnit[eé]|penalt(?:y|ies)|fee).{0,40}?(anderhalve maand|een halve maand|un mois et demi|demi-?mois|\d+(?:[.,]\d+)?\s*(?:maanden?|months?|mois))/gi,
     },
     {
       actor: 'landlord',
@@ -311,7 +311,7 @@ function parseSignals(text: string): ParsedLeaseSignals {
   const durationClauses = captureDurationClauses(normalized);
 
   const tenantEarlyTerminationForbidden =
-    /(?:huurder|tenant|locataire).{0,120}?(?:kan|may|peut).{0,40}?(?:niet|not|pas).{0,80}?(?:vroegtijdig|early|avant le terme|before the end|anticip[eé]e?).{0,80}?(?:opzeggen|terminate|resilier)/i.test(
+    /(?:\bhuurder|\btenant|\blocataire).{0,120}?(?:kan|may|peut).{0,40}?(?:niet|not|pas).{0,80}?(?:vroegtijdig|early|avant le terme|before the end|anticip[eé]e?).{0,80}?(?:opzeggen|terminate|resilier)/i.test(
       normalized,
     ) ||
     /(?:geen|no|aucun).{0,40}?(?:vroegtijdige|early|anticipated).{0,40}?(?:opzeg|termination|resiliation).{0,40}?(?:door de huurder|for the tenant|par le locataire)/i.test(
@@ -328,7 +328,7 @@ function parseSignals(text: string): ParsedLeaseSignals {
   ]);
 
   const registrationAssignedToTenant =
-    /(?:huurder|tenant|locataire).{0,100}?(?:moet|shall|must|doit).{0,80}?(?:registr(?:eren|atie)|register|enregistrer|enregistrement)/i.test(
+    /(?:\bhuurder|\btenant|\blocataire).{0,100}?(?:moet|shall|must|doit).{0,80}?(?:registr(?:eren|atie)|register|enregistrer|enregistrement)/i.test(
       normalized,
     ) &&
     !/(?:verhuurder|landlord|bailleur).{0,80}?(?:moet|shall|must|doit).{0,80}?(?:registr(?:eren|atie)|register|enregistrer|enregistrement)/i.test(
@@ -371,7 +371,7 @@ function parseSignals(text: string): ParsedLeaseSignals {
     );
 
   const propertyTaxChargedToTenant =
-    /(?:huurder|tenant|locataire).{0,120}?(?:betaalt|pays|pay).{0,80}?(?:onroerende voorheffing|property tax|precompte immobilier)/i.test(
+    /(?:\bhuurder|\btenant|\blocataire).{0,120}?(?:betaalt|pays|pay).{0,80}?(?:onroerende voorheffing|property tax|precompte immobilier)/i.test(
       normalized,
     ) ||
     /(?:onroerende voorheffing|property tax|precompte immobilier).{0,80}?(?:ten laste van de huurder|for the tenant|a charge du locataire)/i.test(
@@ -387,12 +387,12 @@ function parseSignals(text: string): ParsedLeaseSignals {
 
   const inventoryWaived =
     /(?:geen|no|sans).{0,40}?(?:plaatsbeschrijving|inventory|etat des lieux)/i.test(normalized) ||
-    /(?:huurder|tenant|locataire).{0,120}?(?:aanvaardt|accepts|accepte).{0,80}?(?:in de huidige staat|as is|en l[' ]etat)/i.test(
+    /(?:\bhuurder|\btenant|\blocataire).{0,120}?(?:aanvaardt|accepts|accepte).{0,80}?(?:in de huidige staat|as is|en l[' ]etat)/i.test(
       normalized,
     );
 
   const fireInsuranceTenantMentioned =
-    /(?:huurder|tenant|locataire).{0,80}?(?:brandverzekering|fire insurance|assurance incendie)/i.test(
+    /(?:\bhuurder|\btenant|\blocataire).{0,80}?(?:brandverzekering|fire insurance|assurance incendie)/i.test(
       normalized,
     );
 
@@ -663,7 +663,7 @@ function buildAllFields(text: string, signals: ParsedLeaseSignals): Record<Lease
       status: signals.registrationAssignedToTenant ? 'found' : 'missing',
       snippet: findSnippet(
         normalized,
-        /(?:huurder|tenant|locataire).{0,100}?(?:moet|shall|must|doit).{0,80}?(?:registr(?:eren|atie)|register|enregistrer|enregistrement)/i,
+        /(?:\bhuurder|\btenant|\blocataire).{0,100}?(?:moet|shall|must|doit).{0,80}?(?:registr(?:eren|atie)|register|enregistrer|enregistrement)/i,
       ),
     }),
     'inventory.mentioned': makeValue(signals.inventoryMentioned, {
@@ -676,7 +676,7 @@ function buildAllFields(text: string, signals: ParsedLeaseSignals): Record<Lease
       status: signals.inventoryWaived ? 'found' : 'missing',
       snippet: findSnippet(
         normalized,
-        /(?:geen|no|sans).{0,40}?(?:plaatsbeschrijving|inventory|etat des lieux)|(?:huurder|tenant|locataire).{0,120}?(?:aanvaardt|accepts|accepte).{0,80}?(?:in de huidige staat|as is|en l[' ]etat)/i,
+        /(?:geen|no|sans).{0,40}?(?:plaatsbeschrijving|inventory|etat des lieux)|(?:\bhuurder|\btenant|\blocataire).{0,120}?(?:aanvaardt|accepts|accepte).{0,80}?(?:in de huidige staat|as is|en l[' ]etat)/i,
       ),
     }),
     'insurance.fireMentioned': makeValue(
@@ -701,7 +701,7 @@ function buildAllFields(text: string, signals: ParsedLeaseSignals): Record<Lease
       status: signals.fireInsuranceTenantMentioned ? 'found' : 'missing',
       snippet: findSnippet(
         normalized,
-        /(?:huurder|tenant|locataire).{0,80}?(?:brandverzekering|fire insurance|assurance incendie)/i,
+        /(?:\bhuurder|\btenant|\blocataire).{0,80}?(?:brandverzekering|fire insurance|assurance incendie)/i,
       ),
     }),
     'insurance.fireLandlordMentioned': makeValue(signals.fireInsuranceLandlordMentioned, {
@@ -743,7 +743,7 @@ function buildAllFields(text: string, signals: ParsedLeaseSignals): Record<Lease
       status: signals.tenantEarlyTerminationForbidden ? 'found' : 'missing',
       snippet: findSnippet(
         normalized,
-        /(?:huurder|tenant|locataire).{0,120}?(?:kan|may|peut).{0,40}?(?:niet|not|pas).{0,80}?(?:vroegtijdig|early|avant le terme|before the end|anticip[eé]e?).{0,80}?(?:opzeggen|terminate|resilier)|(?:geen|no|aucun).{0,40}?(?:vroegtijdige|early|anticipated).{0,40}?(?:opzeg|termination|resiliation).{0,40}?(?:door de huurder|for the tenant|par le locataire)/i,
+        /(?:\bhuurder|\btenant|\blocataire).{0,120}?(?:kan|may|peut).{0,40}?(?:niet|not|pas).{0,80}?(?:vroegtijdig|early|avant le terme|before the end|anticip[eé]e?).{0,80}?(?:opzeggen|terminate|resilier)|(?:geen|no|aucun).{0,40}?(?:vroegtijdige|early|anticipated).{0,40}?(?:opzeg|termination|resiliation).{0,40}?(?:door de huurder|for the tenant|par le locataire)/i,
       ),
     }),
     'termination.landlordEarlyAllowed': makeValue(signals.landlordEarlyTerminationAllowed, {
