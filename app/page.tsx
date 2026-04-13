@@ -147,7 +147,25 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center py-16 px-4">
       <div className="w-full max-w-2xl">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">LeaseCheck</h1>
+        <div className="flex items-start justify-between mb-2">
+          <h1 className="text-3xl font-bold tracking-tight">LeaseCheck</h1>
+          <div className="flex items-center gap-3 mt-1">
+            <a
+              href="mailto:samridhivigd.a.v@gmail.com"
+              className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2"
+            >
+              Feedback
+            </a>
+            <a
+              href="https://ko-fi.com/samridhivig"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded-full transition-colors whitespace-nowrap"
+            >
+              ☕ Buy me a coffee
+            </a>
+          </div>
+        </div>
         <p className="text-gray-500 mb-10 text-sm">
           Check your Flemish rental contract against the Woninghuurdecreet 2019. Flags issues with deposits, notice periods, break fees, and required clauses.
         </p>
