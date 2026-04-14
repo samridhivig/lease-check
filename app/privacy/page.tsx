@@ -72,17 +72,6 @@ export default function PrivacyPage() {
             for details.
           </p>
 
-          <h2 className="text-lg font-semibold text-gray-900">Contact</h2>
-          <p>
-            If you have questions about this policy, reach out at{' '}
-            <a
-              href="mailto:samridhivigd.a.v@gmail.com"
-              className="underline underline-offset-2"
-            >
-              samridhivigd.a.v@gmail.com
-            </a>
-            .
-          </p>
         </section>
 
         <div className="mt-12">

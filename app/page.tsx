@@ -167,8 +167,8 @@ export default function Home() {
             </a>
           </div>
         </div>
-        <p className="text-gray-500 mb-10 text-sm">
-          Check your Flemish rental contract against the Woninghuurdecreet 2019. Flags issues with deposits, notice periods, break fees, and required clauses.
+        <p className="text-gray-500 mb-3 text-sm">
+          Upload your Flemish rental contract for an automated first-pass review.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -222,6 +222,12 @@ export default function Home() {
               {loading ? 'Processing\u2026' : 'Translate to English'}
             </button>
           </div>
+
+          <p className="text-xs text-gray-400">
+            Automated checks can miss context, unusual wording, or poorly extracted
+            text. Results may be incomplete or incorrect. Use this as a screening
+            tool, not a final legal check.
+          </p>
         </form>
 
         {error && (
@@ -392,8 +398,8 @@ export default function Home() {
       </div>
       <footer className="mt-16 text-xs text-gray-400 text-center space-y-1">
         <p>
-          This is an automated analysis for Flemish residential leases signed from 1 January
-          2019 onward, not legal advice.
+          Automated review for Flemish residential leases signed from 1 January 2019
+          onward. Not legal advice.
         </p>
         <p>
           <a href="/privacy" className="underline underline-offset-2 hover:text-gray-600">

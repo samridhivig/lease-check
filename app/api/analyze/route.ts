@@ -132,10 +132,10 @@ function buildSummary(
   }
 
   if (flags.length === 0) {
-    return 'No issues found. Review the full document for any clauses not covered by automated checks.';
+    return 'No issues were flagged in this automated review. That does not guarantee the contract is compliant.';
   }
 
-  return `Found ${flags.length} potential issue${flags.length > 1 ? 's' : ''} in your lease.`;
+  return `Found ${flags.length} potential issue${flags.length > 1 ? 's' : ''} in your lease. Please review the original clauses carefully.`;
 }
 
 function getClientIp(req: NextRequest): string {
