@@ -147,12 +147,12 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center py-16 px-4">
       <div className="w-full max-w-2xl">
-        <div className="flex items-start justify-between mb-2">
+        <div className="mb-2 flex items-start justify-between">
           <h1 className="text-3xl font-bold tracking-tight">LeaseCheck</h1>
           <div className="flex items-center gap-3 mt-1">
             <a
               href="mailto:samridhivigd.a.v@gmail.com"
-              className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2"
+              className="text-xs text-gray-400 underline underline-offset-2 hover:text-gray-600"
             >
               Feedback
             </a>
@@ -162,7 +162,8 @@ export default function Home() {
               rel="noreferrer"
               className="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded-full transition-colors whitespace-nowrap"
             >
-              ☕ Buy me a coffee
+              <span className="sm:hidden">☕</span>
+              <span className="hidden sm:inline">☕ Buy me a coffee</span>
             </a>
           </div>
         </div>
