@@ -16,10 +16,10 @@ type TranslationResult = {
   skippedReason: string | null;
 };
 
-const SEVERITY_CARD: Record<string, string> = {
-  high: 'bg-red-50 border-red-200 text-red-800',
-  medium: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-  low: 'bg-blue-50 border-blue-200 text-blue-800',
+const SEVERITY_HEADER: Record<string, string> = {
+  high: 'bg-red-50 hover:bg-red-100/70',
+  medium: 'bg-yellow-50 hover:bg-yellow-100/70',
+  low: 'bg-blue-50 hover:bg-blue-100/70',
 };
 
 const SEVERITY_BADGE: Record<string, string> = {
@@ -71,6 +71,7 @@ function ScopeWarning({ extraction }: { extraction: ExtractionMeta }) {
 
 export default function Home() {
   const [fieldsOpen, setFieldsOpen] = useState(false);
+  const [openFlagKey, setOpenFlagKey] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,12 +111,19 @@ export default function Home() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setOpenFlagKey(null);
 
     window.gtag?.('event', 'analyze_contract');
 
     try {
       const analysisResponse = await requestAnalysis(file);
       setResult(analysisResponse);
+      if (analysisResponse.flags.length > 0) {
+        const firstFlag = analysisResponse.flags[0];
+        setOpenFlagKey(`${firstFlag.ruleId}-${firstFlag.clause}-0`);
+      } else {
+        setOpenFlagKey(null);
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Something went wrong',
@@ -187,6 +195,7 @@ export default function Home() {
                 setError(null);
                 setTranslation(null);
                 setTranslationError(null);
+                setOpenFlagKey(null);
               }}
             />
             {file ? (
@@ -322,73 +331,118 @@ export default function Home() {
                 <h2 className="text-lg font-semibold mb-3">Flags</h2>
                 <ul className="space-y-3">
                   {result.flags.map((flag, i) => (
-                    <li
-                      key={i}
-                      className={`border rounded-lg p-4 text-sm ${SEVERITY_CARD[flag.severity]}`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium">{flag.clause}</span>
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${SEVERITY_BADGE[flag.severity]}`}
-                        >
-                          {flag.severity}
-                        </span>
-                        {flag.uncertain && (
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-white/70 text-gray-700 border border-gray-200">
-                            manual check
-                          </span>
-                        )}
-                      </div>
-                      <p>{flag.issue}</p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {flag.sources.map((source) => (
-                          <a
-                            key={`${flag.ruleId}-${source.url}`}
-                            href={source.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-xs underline underline-offset-2"
-                          >
-                            {source.label}
-                          </a>
-                        ))}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
+                    (() => {
+                      const key = `${flag.ruleId}-${flag.clause}-${i}`;
+                      const panelId = `flag-explanation-${i}`;
+                      const buttonId = `flag-trigger-${i}`;
+                      const isOpen = openFlagKey === key;
+                      const matchedExplanation =
+                        result.explanations.find(
+                          (exp) =>
+                            exp.ruleId === flag.ruleId && exp.clause === flag.clause,
+                        ) ??
+                        result.explanations.find((exp) => exp.ruleId === flag.ruleId);
+                      const explanationText =
+                        matchedExplanation?.explanation ??
+                        'No additional explanation is available for this flag yet.';
+                      const explanationSources =
+                        matchedExplanation?.sources.length
+                          ? matchedExplanation.sources
+                          : flag.sources;
 
-            {result.explanations.length > 0 && (
-              <section>
-                <h2 className="text-lg font-semibold mb-3">Explanations</h2>
-                <ul className="space-y-3">
-                  {result.explanations.map((exp, i) => (
-                    <li
-                      key={i}
-                      className="border border-gray-200 rounded-lg p-4 text-sm bg-white"
-                    >
-                      <p className="font-medium text-gray-800 mb-1">{exp.clause}</p>
-                      <p className="text-gray-600">{exp.explanation}</p>
-                      {exp.uncertain && (
-                        <p className="text-xs text-amber-700 mt-2">
-                          This check is conservative and should be confirmed manually.
-                        </p>
-                      )}
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {exp.sources.map((source) => (
-                          <a
-                            key={`${exp.ruleId}-${source.url}`}
-                            href={source.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-xs text-gray-500 underline underline-offset-2"
+                      return (
+                        <li
+                          key={key}
+                          className="border border-gray-200 rounded-lg text-sm bg-white overflow-hidden"
+                        >
+                          <button
+                            id={buttonId}
+                            type="button"
+                            aria-expanded={isOpen}
+                            aria-controls={panelId}
+                            aria-label={isOpen ? 'Hide explanation details' : 'Show explanation details'}
+                            onClick={() =>
+                              setOpenFlagKey((prev) => (prev === key ? null : key))
+                            }
+                            className={`group w-full p-4 text-left text-gray-900 min-h-[44px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-700 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${SEVERITY_HEADER[flag.severity]} ${isOpen ? 'rounded-t-lg' : 'rounded-lg'}`}
                           >
-                            {source.label}
-                          </a>
-                        ))}
-                      </div>
-                    </li>
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="flex flex-wrap items-center gap-2 mb-1">
+                                  <span className="font-medium">{flag.clause}</span>
+                                  <span
+                                    className={`text-xs px-2 py-0.5 rounded-full font-medium ${SEVERITY_BADGE[flag.severity]}`}
+                                  >
+                                    {flag.severity}
+                                  </span>
+                                  {flag.uncertain && (
+                                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-white/70 text-gray-700 border border-gray-200">
+                                      manual check
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-sm text-gray-700 leading-5">{flag.issue}</p>
+                              </div>
+                              <div className="mt-0.5 shrink-0 flex items-center gap-2 text-xs font-medium text-gray-600 group-hover:text-gray-700">
+                                <span className="hidden sm:inline whitespace-nowrap">Details</span>
+                                <span
+                                  className={`text-[11px] text-gray-500 transition-transform ${isOpen ? 'rotate-90' : ''}`}
+                                  aria-hidden="true"
+                                >
+                                  &#9654;
+                                </span>
+                              </div>
+                            </div>
+                          </button>
+
+                          {isOpen && (
+                            <div
+                              id={panelId}
+                              role="region"
+                              aria-labelledby={buttonId}
+                              className="px-4 pt-4 pb-4 border-t border-gray-200 bg-white"
+                            >
+                              <p className="text-gray-700 leading-6">{explanationText}</p>
+                              {flag.uncertain && (
+                                <p className="text-xs text-amber-700 mt-2">
+                                  This check is conservative and should be confirmed
+                                  manually.
+                                </p>
+                              )}
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {explanationSources.map((source) => (
+                                  <a
+                                    key={`${flag.ruleId}-${source.url}`}
+                                    href={source.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label={`${source.label} (opens in a new tab)`}
+                                    title="Opens in a new tab"
+                                    className="inline-flex min-h-[44px] items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-700 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                                  >
+                                    <span>{source.label}</span>
+                                    <svg
+                                      aria-hidden="true"
+                                      viewBox="0 0 16 16"
+                                      fill="none"
+                                      className="h-4 w-4 shrink-0 self-center text-gray-600"
+                                    >
+                                      <path
+                                        d="M5 11L11 5M7 5h4v4"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      />
+                                    </svg>
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })()
                   ))}
                 </ul>
               </section>
