@@ -9,10 +9,16 @@ declare global {
   }
 }
 
+type TranslationBlock = {
+  type: 'heading' | 'clause' | 'list-item' | 'paragraph';
+  text: string;
+};
+
 type TranslationResult = {
   detectedLanguage: string;
   detectedLanguageCode: string;
   translatedText: string | null;
+  blocks: TranslationBlock[];
   skippedReason: string | null;
 };
 
@@ -26,6 +32,15 @@ const SEVERITY_BADGE: Record<string, string> = {
   high: 'bg-red-100 text-red-700',
   medium: 'bg-yellow-100 text-yellow-700',
   low: 'bg-blue-100 text-blue-700',
+};
+
+const TRANSLATION_BLOCK_STYLES: Record<TranslationBlock['type'], string> = {
+  heading:
+    'text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 pt-2 first:pt-0',
+  clause:
+    'text-sm leading-7 text-gray-800 font-medium rounded-lg border border-gray-200 bg-gray-50 px-4 py-3',
+  'list-item': 'text-sm leading-7 text-gray-700 pl-5 -indent-5',
+  paragraph: 'text-sm leading-7 text-gray-700',
 };
 
 async function parseErrorResponse(res: Response): Promise<string> {
@@ -73,12 +88,14 @@ export default function Home() {
   const [fieldsOpen, setFieldsOpen] = useState(false);
   const [openFlagKey, setOpenFlagKey] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [translationError, setTranslationError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [translation, setTranslation] = useState<TranslationResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isBusy = isAnalyzing || isTranslating;
 
   async function requestAnalysis(selectedFile: File) {
     const body = new FormData();
@@ -108,7 +125,7 @@ export default function Home() {
     e.preventDefault();
     if (!file) return;
 
-    setLoading(true);
+    setIsAnalyzing(true);
     setError(null);
     setResult(null);
     setOpenFlagKey(null);
@@ -129,7 +146,7 @@ export default function Home() {
         err instanceof Error ? err.message : 'Something went wrong',
       );
     } finally {
-      setLoading(false);
+      setIsAnalyzing(false);
     }
   }
 
@@ -138,7 +155,7 @@ export default function Home() {
 
     window.gtag?.('event', 'translate_contract');
 
-    setLoading(true);
+    setIsTranslating(true);
     setTranslation(null);
     setTranslationError(null);
 
@@ -148,7 +165,7 @@ export default function Home() {
     } catch (err) {
       setTranslationError(err instanceof Error ? err.message : 'Translation failed');
     } finally {
-      setLoading(false);
+      setIsTranslating(false);
     }
   }
 
@@ -216,19 +233,19 @@ export default function Home() {
           <div className="grid gap-3 sm:grid-cols-2">
             <button
               type="submit"
-              disabled={!file || loading}
+              disabled={!file || isBusy}
               className="w-full bg-gray-900 text-white rounded-lg py-3 text-sm font-medium disabled:opacity-40 hover:bg-gray-700 transition-colors"
             >
-              {loading ? 'Processing\u2026' : 'Analyze Contract'}
+              {isAnalyzing ? 'Analyzing\u2026' : 'Analyze Contract'}
             </button>
 
             <button
               type="button"
-              disabled={!file || loading}
+              disabled={!file || isBusy}
               onClick={handleTranslateOnly}
               className="w-full border border-gray-300 text-gray-800 rounded-lg py-3 text-sm font-medium disabled:opacity-40 hover:border-gray-400 transition-colors"
             >
-              {loading ? 'Processing\u2026' : 'Translate to English'}
+              {isTranslating ? 'Translating\u2026' : 'Translate to English'}
             </button>
           </div>
 
@@ -251,6 +268,47 @@ export default function Home() {
           </div>
         )}
 
+        {isTranslating && (
+          <section className="mt-10 space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold mb-1">Translation</h2>
+              <p className="text-sm text-gray-500">
+                Preparing an English preview from the uploaded lease.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div className="mb-4 border-b border-gray-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-3 w-3 animate-pulse rounded-full bg-gray-900" />
+                  <p className="text-sm font-medium text-gray-900">Translation in progress</p>
+                </div>
+                <p className="mt-1 pl-6 text-sm text-gray-500">
+                  Detecting language, translating paragraphs, and preparing the preview.
+                </p>
+              </div>
+
+              <div className="space-y-4" aria-hidden="true">
+                <div className="h-4 w-32 rounded bg-gray-100" />
+                <div className="space-y-2 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                  <div className="h-3 w-full rounded bg-gray-200" />
+                  <div className="h-3 w-11/12 rounded bg-gray-200" />
+                  <div className="h-3 w-4/5 rounded bg-gray-200" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 w-full rounded bg-gray-100" />
+                  <div className="h-3 w-10/12 rounded bg-gray-100" />
+                  <div className="h-3 w-9/12 rounded bg-gray-100" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-3 w-full rounded bg-gray-100" />
+                  <div className="h-3 w-11/12 rounded bg-gray-100" />
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {translation && (
           <section className="mt-10 space-y-4">
             <div>
@@ -268,13 +326,27 @@ export default function Home() {
                 {translation.skippedReason}
               </div>
             ) : (
-              <div className="rounded-xl border border-gray-200 bg-white p-4">
-                <p className="mb-3 text-sm text-gray-500">
-                  English translation preview. Analysis has not been changed to use this
-                  text yet.
-                </p>
-                <div className="max-h-[32rem] overflow-y-auto whitespace-pre-wrap text-sm leading-6 text-gray-700">
-                  {translation.translatedText}
+              <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div className="mb-4 border-b border-gray-100 pb-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">English translation preview</p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Paragraph-aware rendering for easier clause-by-clause reading.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="max-h-[38rem] overflow-y-auto pr-1">
+                  <div className="space-y-4">
+                    {translation.blocks.map((block, index) => (
+                      <p
+                        key={`${block.type}-${index}`}
+                        className={TRANSLATION_BLOCK_STYLES[block.type]}
+                      >
+                        {block.text}
+                      </p>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

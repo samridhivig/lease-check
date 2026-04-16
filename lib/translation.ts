@@ -31,10 +31,18 @@ type DutchTranslator = (
   options?: Record<string, unknown>
 ) => Promise<TranslationChunk[]>;
 
+export type TranslationBlockType = 'heading' | 'clause' | 'list-item' | 'paragraph';
+
+export interface TranslationBlock {
+  type: TranslationBlockType;
+  text: string;
+}
+
 export interface DocumentTranslationResult {
   detectedLanguage: string;
   detectedLanguageCode: string;
   translatedText: string | null;
+  blocks: TranslationBlock[];
   skippedReason: string | null;
 }
 
@@ -71,6 +79,10 @@ async function getDutchTranslator(): Promise<DutchTranslator> {
 
 function normalizeText(text: string): string {
   return text.replace(/\r/g, '').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function splitParagraphs(text: string): string[] {
+  return normalizeText(text).split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean);
 }
 
 function detectLanguage(text: string): { code: string; label: string } {
@@ -132,45 +144,9 @@ function splitLongSegment(segment: string): string[] {
   return chunks;
 }
 
-function chunkDocument(text: string): string[] {
-  const paragraphs = normalizeText(text).split(/\n{2,}/).filter(Boolean);
-  const chunks: string[] = [];
-  let current = '';
-
-  for (const paragraph of paragraphs) {
-    if (paragraph.length > MAX_CHARS_PER_CHUNK) {
-      if (current) {
-        chunks.push(current);
-        current = '';
-      }
-
-      chunks.push(...splitLongSegment(paragraph));
-      continue;
-    }
-
-    const candidate = current ? `${current}\n\n${paragraph}` : paragraph;
-
-    if (candidate.length > MAX_CHARS_PER_CHUNK) {
-      if (current) {
-        chunks.push(current);
-      }
-      current = paragraph;
-      continue;
-    }
-
-    current = candidate;
-  }
-
-  if (current) {
-    chunks.push(current);
-  }
-
-  return chunks;
-}
-
-async function translateDutchText(text: string): Promise<string> {
+async function translateParagraph(paragraph: string): Promise<string> {
   const translator = await getDutchTranslator();
-  const chunks = chunkDocument(text);
+  const chunks = splitLongSegment(paragraph);
   const translatedChunks: string[] = [];
 
   for (const chunk of chunks) {
@@ -181,7 +157,70 @@ async function translateDutchText(text: string): Promise<string> {
     translatedChunks.push(output[0]?.translation_text?.trim() ?? '');
   }
 
-  return translatedChunks.join('\n\n').trim();
+  return translatedChunks.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+function isLikelyHeading(paragraph: string): boolean {
+  const compact = paragraph.replace(/\s+/g, ' ').trim();
+  if (!compact || compact.length > 90) {
+    return false;
+  }
+
+  if (/^(article|section|clause)\b[:.]?/i.test(compact)) {
+    return true;
+  }
+
+  if (/^\d+(?:\.\d+)*[.)]?\s+[A-Z]/.test(compact)) {
+    return true;
+  }
+
+  const lettersOnly = compact.replace(/[^A-Za-zÀ-ÿ]/g, '');
+  if (lettersOnly.length < 4) {
+    return false;
+  }
+
+  const uppercaseRatio =
+    lettersOnly.split('').filter((char) => char === char.toUpperCase()).length /
+    lettersOnly.length;
+
+  return uppercaseRatio > 0.8;
+}
+
+function classifyParagraph(paragraph: string): TranslationBlockType {
+  const compact = paragraph.replace(/\s+/g, ' ').trim();
+
+  if (/^(?:[-*•]\s+|\d+[.)]\s+|[A-Za-z][.)]\s+)/.test(compact)) {
+    return 'list-item';
+  }
+
+  if (isLikelyHeading(compact)) {
+    return 'heading';
+  }
+
+  if (/^\d+(?:\.\d+)+(?:[.)])?\s+/.test(compact) || /^\d+[.)]\s+/.test(compact)) {
+    return 'clause';
+  }
+
+  return 'paragraph';
+}
+
+async function translateDutchText(text: string): Promise<TranslationBlock[]> {
+  const paragraphs = splitParagraphs(text);
+  const blocks: TranslationBlock[] = [];
+
+  for (const paragraph of paragraphs) {
+    const translatedText = await translateParagraph(paragraph);
+    if (!translatedText) {
+      continue;
+    }
+
+    blocks.push({
+      type: classifyParagraph(paragraph),
+      text: translatedText,
+    });
+  }
+
+  return blocks;
 }
 
 export async function translateDocument(text: string): Promise<DocumentTranslationResult> {
@@ -193,6 +232,7 @@ export async function translateDocument(text: string): Promise<DocumentTranslati
       detectedLanguage: 'Unknown',
       detectedLanguageCode: 'und',
       translatedText: null,
+      blocks: [],
       skippedReason: 'The PDF did not contain readable text.',
     };
   }
@@ -202,6 +242,7 @@ export async function translateDocument(text: string): Promise<DocumentTranslati
       detectedLanguage: detection.label,
       detectedLanguageCode: detection.code,
       translatedText: null,
+      blocks: [],
       skippedReason:
         detection.code === 'und'
           ? 'The document language could not be detected, so translation was skipped.'
@@ -209,12 +250,14 @@ export async function translateDocument(text: string): Promise<DocumentTranslati
     };
   }
 
-  const translatedText = await translateDutchText(normalizedText);
+  const blocks = await translateDutchText(normalizedText);
+  const translatedText = blocks.map((block) => block.text).join('\n\n').trim();
 
   return {
     detectedLanguage: detection.label,
     detectedLanguageCode: detection.code,
     translatedText,
+    blocks,
     skippedReason: null,
   };
 }
