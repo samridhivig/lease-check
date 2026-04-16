@@ -7,6 +7,20 @@ const DUTCH_MODEL_ID = 'Xenova/opus-mt-nl-en';
 const LANGUAGE_SAMPLE_LIMIT = 4000;
 const MIN_DETECTION_LENGTH = 50;
 const MAX_CHARS_PER_CHUNK = 900;
+const LOCAL_CACHE_DIR = path.join(process.cwd(), '.cache', 'transformers');
+
+function getTransformersCacheDir(): string {
+  if (process.env.TRANSFORMERS_CACHE) {
+    return process.env.TRANSFORMERS_CACHE;
+  }
+
+  // Serverless runtimes typically only allow writes under /tmp.
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return '/tmp/transformers-cache';
+  }
+
+  return LOCAL_CACHE_DIR;
+}
 
 type TranslationChunk = {
   translation_text: string;
@@ -41,7 +55,7 @@ async function getDutchTranslator(): Promise<DutchTranslator> {
     globalForTranslation.dutchTranslatorPromise = (async () => {
       const { env, pipeline } = await import('@huggingface/transformers');
 
-      env.cacheDir = path.join(process.cwd(), '.cache', 'transformers');
+      env.cacheDir = getTransformersCacheDir();
 
       return (await pipeline('translation', DUTCH_MODEL_ID)) as DutchTranslator;
     })();

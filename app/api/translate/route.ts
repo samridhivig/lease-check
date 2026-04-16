@@ -30,7 +30,24 @@ export async function POST(req: NextRequest) {
     return res;
   }
 
-  const formData = await req.formData();
+  const contentType = req.headers.get('content-type') ?? '';
+  if (!contentType.startsWith('multipart/form-data')) {
+    return NextResponse.json(
+      { error: 'Expected multipart/form-data with a file upload.' },
+      { status: 415 },
+    );
+  }
+
+  let formData: FormData;
+  try {
+    formData = await req.formData();
+  } catch {
+    return NextResponse.json(
+      { error: 'Invalid form-data payload. Please upload a PDF file.' },
+      { status: 400 },
+    );
+  }
+
   const file = formData.get('file');
 
   if (!file || !(file instanceof Blob)) {
@@ -54,6 +71,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to parse PDF' }, { status: 422 });
   }
 
-  const result = await translateDocument(text);
-  return NextResponse.json(result);
+  try {
+    const result = await translateDocument(text);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('Translation failed', error);
+    return NextResponse.json(
+      {
+        error:
+          'Translation is temporarily unavailable. Please try again in a moment.',
+      },
+      { status: 503 },
+    );
+  }
 }
