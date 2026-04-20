@@ -42,6 +42,14 @@ function getFieldValue<T>(result: ExtractFieldsResult, fieldId: keyof ExtractFie
   return (result.fields[fieldId]?.value as T | null | undefined) ?? null;
 }
 
+function getDocumentKind(result: ExtractFieldsResult): string | null {
+  return getFieldValue<string>(result, 'document.kind');
+}
+
+function isRulebookScopedDocument(result: ExtractFieldsResult): boolean {
+  return getDocumentKind(result) === 'residential_lease';
+}
+
 function getBoolean(result: ExtractFieldsResult, fieldId: keyof ExtractFieldsResult['fields']): boolean {
   return getFieldValue<boolean>(result, fieldId) === true;
 }
@@ -364,6 +372,10 @@ export function getRuleDefinition(ruleId: string): RuleDefinition | undefined {
 }
 
 export function runRules(result: ExtractFieldsResult): Flag[] {
+  if (!isRulebookScopedDocument(result)) {
+    return [];
+  }
+
   const flags: Flag[] = [];
 
   for (const rule of FLANDERS_RULES) {

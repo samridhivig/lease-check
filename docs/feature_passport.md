@@ -11,6 +11,7 @@ LeaseCheck is a web-based application designed to help prospective tenants verif
   * Rent indexation rules and frequencies.
   * Property tax assignment to the tenant (which is illegal in Flanders).
   * Requirement of an entry inventory and registration rules.
+* **Document Classification & Scope Check**: Before applying legal flags, the application classifies the uploaded contract. If it looks like a commercial lease, student lease, sublease, social/regulated template, or another out-of-scope document, LeaseCheck still shows extracted data but skips the Flemish residential rule checks.
 * **Smart Issue Flagging**: Findings are categorized into actionable flags with severe issues marked prominently. Each flag contains:
   * **Severity Rating**: High (red), Medium (yellow), Low (blue).
   * **Explanation**: User-friendly advice explaining why the clause is problematic.
@@ -24,6 +25,7 @@ LeaseCheck is a web-based application designed to help prospective tenants verif
 3. **Processing**: The user clicks "Analyze Contract". The application parses the text, extracts the signals, evaluates them against the rules, and runs the translator in the background.
 4. **Review Results**: 
    * A summary of the translation is shown on screen along with an English preview.
+   * If the uploaded contract is classified as out of scope, the summary explains that legal rule checks were not applied.
    * Actionable "Flags" appear, dissecting specific clauses and providing legal context.
    * "Explanations" are presented detailing what specific clauses mean and linking to external verification.
 
@@ -32,3 +34,4 @@ LeaseCheck is a web-based application designed to help prospective tenants verif
 * The analysis tool is not a replacement for qualified legal advice.
 * The system expects standard, readable PDF formats—highly stylized or scanned documents without OCR might fail parsing.
 * Tailored exclusively to the **Flanders** regulation scheme (post-2019 residential leases). Other Belgian regions (Brussels or Wallonia) or commercial leases are not supported.
+* Some non-standard contracts may still be partially extracted for display, but legal flags are intentionally suppressed when the document classification falls outside the supported residential scope.

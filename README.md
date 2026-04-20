@@ -4,6 +4,8 @@ Upload a Flemish rental contract (PDF) and get a breakdown of potential issues b
 
 The tool extracts fields like deposit amount, notice periods, lease duration, and required clauses using regex pattern matching, then compares them against the legal thresholds. No LLM is used for analysis. There's also a translation feature for Dutch contracts that runs a small language model locally on the server.
 
+The analysis pipeline now also classifies the uploaded document type. If a contract appears to be outside the currently supported Flemish principal-residence residential lease scope, LeaseCheck still extracts fields but skips the legal rule checks and explains that the contract is out of scope.
+
 Nothing is stored. Your PDF is processed in memory and discarded when the request finishes.
 
 https://lease-check.vercel.app

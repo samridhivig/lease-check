@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "fixtures:advo-recht": "node scripts/fetch-advo-recht-contracts.mjs",
+    "analyze:fixtures": "node scripts/analyze-fixtures.mjs",
+    "test:fixtures": "node scripts/check-fixtures.mjs"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.0.1",

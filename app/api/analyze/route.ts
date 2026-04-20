@@ -17,15 +17,27 @@ import type {
 const MAX_FILE_SIZE = 4.5 * 1024 * 1024; // 4.5 MB
 
 const FIELD_LABELS: Record<string, string> = {
+  'document.kind': 'Document kind',
+  'property.address': 'Property address',
+  'parties.landlord.names': 'Landlord names',
+  'parties.tenant.names': 'Tenant names',
+  'lease.startDate': 'Lease start date',
+  'lease.endDate': 'Lease end date',
   'lease.duration': 'Lease duration',
   'lease.type': 'Lease type',
   'rent.baseAmount': 'Monthly rent',
   'rent.indexationFrequencyMonths': 'Indexation frequency',
   'rent.indexationAutomatic': 'Automatic indexation',
+  'charges.amount': 'Charges amount',
+  'charges.mode': 'Charges mode',
   'deposit.amount': 'Security deposit',
   'deposit.months': 'Deposit (months)',
+  'deposit.method': 'Deposit method',
   'deposit.heldByLandlord': 'Deposit held by landlord',
+  'registration.deadlineMonths': 'Registration deadline',
   'charges.propertyTaxToTenant': 'Property tax to tenant',
+  'epc.label': 'EPC label',
+  'epc.score': 'EPC score',
   'notice.tenantMonths': 'Tenant notice period',
   'notice.landlordMonths': 'Landlord notice period',
   'notice.tenantFeeMonths': 'Tenant break fee',
@@ -43,18 +55,68 @@ const FIELD_LABELS: Record<string, string> = {
 
 function formatFieldValue(key: string, field: ExtractedValue<unknown>): string {
   const v = field.value;
-  if (v === null || v === undefined) return 'Not found';
+  if (v === null || v === undefined) {
+    if (field.status === 'ambiguous') {
+      const note = field.notes?.[0] ?? '';
+
+      if (/placeholder|max/i.test(note)) {
+        return 'Template placeholder or maximum only';
+      }
+
+      return 'Ambiguous';
+    }
+
+    return 'Not found';
+  }
   if (typeof v === 'boolean') return v ? 'Yes' : 'No';
+  if (Array.isArray(v)) return v.join(', ');
   if (key === 'rent.baseAmount') return `EUR ${v}`;
+  if (key === 'charges.amount') return `EUR ${v}`;
   if (key === 'deposit.amount') return `EUR ${v}`;
   if (key === 'lease.duration') return `${v} months`;
   if (key === 'rent.indexationFrequencyMonths') return `Every ${v} months`;
+  if (key === 'registration.deadlineMonths') return `${v} months`;
   if (key === 'notice.tenantMonths' || key === 'notice.landlordMonths') return `${v} months`;
   if (key === 'notice.tenantFeeMonths' || key === 'notice.landlordFeeMonths') return `${v} months`;
   if (key === 'deposit.months') return `${v} months`;
+  if (key === 'epc.score') return `${v} kWh/m²`;
   if (key === 'lease.type') {
     const types: Record<string, string> = { short_term: 'Short-term', nine_year: '9-year', long_term: 'Long-term' };
     return types[v as string] ?? String(v);
+  }
+  if (key === 'document.kind') {
+    const kinds: Record<string, string> = {
+      residential_lease: 'Residential lease',
+      commercial_lease: 'Commercial lease',
+      common_law_dwelling_lease: 'Common-law dwelling lease',
+      student_lease: 'Student lease',
+      sublease: 'Sublease',
+      social_housing_lease: 'Social housing lease',
+      social_housing_head_lease: 'Social housing head lease',
+      regulated_residential_lease: 'Regulated residential lease',
+      regulated_head_lease: 'Regulated head lease',
+      regulated_sublease: 'Regulated sublease',
+      unknown_lease: 'Unknown lease type',
+    };
+    return kinds[v as string] ?? String(v);
+  }
+  if (key === 'charges.mode') {
+    const modes: Record<string, string> = {
+      included_in_rent: 'Included in rent',
+      advance: 'Advance / provision',
+      fixed: 'Fixed / forfaitaire',
+      metered: 'Metered',
+    };
+    return modes[v as string] ?? String(v);
+  }
+  if (key === 'deposit.method') {
+    const methods: Record<string, string> = {
+      blocked_account: 'Blocked account',
+      bank_guarantee: 'Bank guarantee',
+      ocmw_bank_guarantee: 'OCMW bank guarantee',
+      third_party_surety: 'Third-party surety',
+    };
+    return methods[v as string] ?? String(v);
   }
   if (key === 'document.language') {
     const langs: Record<string, string> = { nl: 'Dutch', fr: 'French', en: 'English', unknown: 'Unknown' };
@@ -118,9 +180,14 @@ function buildSummary(
   flags: Flag[],
   meta: ExtractionMeta,
   textIsEmpty: boolean,
+  documentKind: string | null,
 ): string {
   if (textIsEmpty) {
     return 'The PDF did not contain readable text. No analysis could be performed.';
+  }
+
+  if (documentKind && documentKind !== 'residential_lease') {
+    return 'This document appears to fall outside the current Flemish principal-residence residential lease scope, so the legal rule checks were not applied.';
   }
 
   if (meta.documentTypeConfidence < 0.35) {
@@ -202,9 +269,11 @@ export async function POST(req: NextRequest) {
   const explanations = mapExplanations(flags);
   const extractedFields = buildFieldSummaries(extraction.fields);
   const extractionMeta = buildExtractionMeta(extraction);
+  const documentKind =
+    (extraction.fields['document.kind']?.value as string | null | undefined) ?? null;
 
   const result: AnalysisResult = {
-    summary: buildSummary(flags, extractionMeta, !text.trim()),
+    summary: buildSummary(flags, extractionMeta, !text.trim(), documentKind),
     flags,
     explanations,
     extractedFields,
