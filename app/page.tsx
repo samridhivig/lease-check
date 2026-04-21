@@ -43,6 +43,8 @@ const TRANSLATION_BLOCK_STYLES: Record<TranslationBlock['type'], string> = {
   paragraph: 'text-sm leading-7 text-gray-700',
 };
 
+const ANALYSIS_ENDPOINT = '/api/analyze-rag';
+
 async function parseErrorResponse(res: Response): Promise<string> {
   if (res.status === 413) {
     return 'This file is too large. The maximum size is 4.5 MB.';
@@ -64,10 +66,10 @@ function ScopeWarning({ extraction }: { extraction: ExtractionMeta }) {
   if (extraction.documentTypeConfidence < 0.35) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-        <p className="font-medium">This does not appear to be a residential lease</p>
+        <p className="font-medium">This does not appear to be a supported lease</p>
         <p className="mt-1">
-          The document matched very few lease-related keywords. The analysis below may not
-          be relevant to your document.
+          LeaseCheck currently supports Flemish residential and student leases only. The
+          analysis below may not be relevant to your document.
         </p>
       </div>
     );
@@ -75,10 +77,10 @@ function ScopeWarning({ extraction }: { extraction: ExtractionMeta }) {
 
   return (
     <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-      <p className="font-medium">Low confidence that this is a residential lease</p>
+      <p className="font-medium">Low confidence that this is a supported lease</p>
       <p className="mt-1">
-        Some lease-related terms were found, but fewer than expected. Results should be
-        reviewed carefully.
+        Some lease-related terms were found, but fewer than expected for a Flemish
+        residential or student lease. Results should be reviewed carefully.
       </p>
     </div>
   );
@@ -101,7 +103,7 @@ export default function Home() {
     const body = new FormData();
     body.append('file', selectedFile);
 
-    const res = await fetch('/api/analyze', { method: 'POST', body });
+    const res = await fetch(ANALYSIS_ENDPOINT, { method: 'POST', body });
     if (!res.ok) {
       throw new Error(await parseErrorResponse(res));
     }
@@ -193,8 +195,13 @@ export default function Home() {
           </div>
         </div>
         <p className="text-gray-500 mb-3 text-sm">
-          Upload your Flemish rental contract for an automated first-pass review.
+          Upload a Flemish residential or student lease for an automated first-pass review.
         </p>
+        <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900">
+          <span className="font-medium">Current scope:</span> Flemish residential leases and
+          Flemish student leases signed from 1 January 2019 onward. Commercial, social,
+          sublease, and other lease types are not legally checked.
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div
@@ -221,7 +228,7 @@ export default function Home() {
               <>
                 <p className="text-sm text-gray-500">Click to select a PDF</p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Rental contracts only &middot; 4.5 MB max
+                  Flemish residential or student leases only &middot; 4.5 MB max
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
                   Your file is processed in memory and never stored
@@ -524,8 +531,8 @@ export default function Home() {
       </div>
       <footer className="mt-16 text-xs text-gray-400 text-center space-y-1">
         <p>
-          Automated review for Flemish residential leases signed from 1 January 2019
-          onward. Not legal advice.
+          Automated review for Flemish residential and student leases signed from 1
+          January 2019 onward. Not legal advice.
         </p>
         <p>
           <a href="/privacy" className="underline underline-offset-2 hover:text-gray-600">

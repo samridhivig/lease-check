@@ -3,19 +3,19 @@ import Script from 'next/script';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'LeaseCheck — Free Flemish Rental Contract Checker',
-  description: 'Free tool to check your Flemish rental contract for issues. Compares your lease against the Woninghuurdecreet 2019 — deposit limits, notice periods, required clauses, and more.',
+  title: 'LeaseCheck — Free Flemish Residential & Student Lease Checker',
+  description: 'Free tool to check supported Flemish residential and student leases against the Woninghuurdecreet 2019 — deposit limits, notice periods, required clauses, and more.',
   openGraph: {
-    title: 'LeaseCheck — Free Flemish Rental Contract Checker',
-    description: 'Check your Flemish rental contract against the Woninghuurdecreet 2019. Free, open source, nothing stored.',
+    title: 'LeaseCheck — Free Flemish Residential & Student Lease Checker',
+    description: 'Check supported Flemish residential and student leases against the Woninghuurdecreet 2019. Free, open source, nothing stored.',
     url: 'https://lease-check.vercel.app',
     siteName: 'LeaseCheck',
     type: 'website',
   },
   twitter: {
     card: 'summary',
-    title: 'LeaseCheck — Free Flemish Rental Contract Checker',
-    description: 'Check your Flemish rental contract against the Woninghuurdecreet 2019. Free, open source, nothing stored.',
+    title: 'LeaseCheck — Free Flemish Residential & Student Lease Checker',
+    description: 'Check supported Flemish residential and student leases against the Woninghuurdecreet 2019. Free, open source, nothing stored.',
   },
 };
 

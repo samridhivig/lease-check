@@ -1,17 +1,18 @@
 # LeaseCheck - Client Side Feature Passport
 
 ## 1. Overview
-LeaseCheck is a web-based application designed to help prospective tenants verify their residential lease agreements before signing. It specifically targets the strict tenancy laws that apply to **Flanders, Belgium** (for contracts signed from 1 January 2019 onward). The tool automates the extraction and analysis of clauses from a user's PDF lease, pointing out potentially illegal or unfavorable terms.
+LeaseCheck is a web-based application designed to help prospective tenants verify Flemish residential and student lease agreements before signing. It specifically targets the strict tenancy laws that apply to **Flanders, Belgium** (for contracts signed from 1 January 2019 onward). The tool automates the extraction and analysis of clauses from a user's PDF lease, pointing out potentially illegal or unfavorable terms.
 
 ## 2. Key Features
 * **PDF Upload & Processing**: Users can easily upload their rental contracts in `.pdf` format.
 * **Automated Legal Analysis**: The system analyzes the uploaded document for key clauses such as:
   * Security deposit amounts and conditions.
   * Notice periods and break fees for early termination (for both short-term and long-term agreements).
+  * Student-lease-specific deposit, renewal, inventory, and termination limits.
   * Rent indexation rules and frequencies.
   * Property tax assignment to the tenant (which is illegal in Flanders).
   * Requirement of an entry inventory and registration rules.
-* **Document Classification & Scope Check**: Before applying legal flags, the application classifies the uploaded contract. If it looks like a commercial lease, student lease, sublease, social/regulated template, or another out-of-scope document, LeaseCheck still shows extracted data but skips the Flemish residential rule checks.
+* **Document Classification & Scope Check**: Before applying legal flags, the application classifies the uploaded contract. Residential leases and student leases use separate rulebooks. If it looks like a commercial lease, sublease, social/regulated template, or another out-of-scope document, LeaseCheck still shows extracted data but skips legal rule checks.
 * **Smart Issue Flagging**: Findings are categorized into actionable flags with severe issues marked prominently. Each flag contains:
   * **Severity Rating**: High (red), Medium (yellow), Low (blue).
   * **Explanation**: User-friendly advice explaining why the clause is problematic.
@@ -33,5 +34,5 @@ LeaseCheck is a web-based application designed to help prospective tenants verif
 * Translation only works from Dutch to English.
 * The analysis tool is not a replacement for qualified legal advice.
 * The system expects standard, readable PDF formats—highly stylized or scanned documents without OCR might fail parsing.
-* Tailored exclusively to the **Flanders** regulation scheme (post-2019 residential leases). Other Belgian regions (Brussels or Wallonia) or commercial leases are not supported.
-* Some non-standard contracts may still be partially extracted for display, but legal flags are intentionally suppressed when the document classification falls outside the supported residential scope.
+* Tailored exclusively to the **Flanders** regulation scheme for supported post-2019 residential and student leases. Other Belgian regions (Brussels or Wallonia) or commercial leases are not supported.
+* Some non-standard contracts may still be partially extracted for display, but legal flags are intentionally suppressed when the document classification falls outside the supported residential or student scope.

@@ -33,10 +33,21 @@ const SOURCES = {
     label: 'Vlaanderen.be - Kosten en lasten',
     url: 'https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/huurprijs-en-huurwaarborg/kosten-en-lasten',
   },
+  student: {
+    label: 'Vlaanderen.be - Studentenhuurovereenkomsten',
+    url: 'https://www.vlaanderen.be/studentenhuurovereenkomsten',
+  },
+  studentCodex: {
+    label: 'Codex Vlaanderen - Vlaams Woninghuurdecreet titel III',
+    url: 'https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963',
+  },
 } as const;
 
 export const FLANDERS_RULEBOOK_SCOPE =
   'Designed for principal-residence residential leases in Flanders signed on or after 1 January 2019.';
+
+export const FLANDERS_STUDENT_RULEBOOK_SCOPE =
+  'Designed for Flemish student leases signed on or after 1 January 2019 where the rented unit is not the student main residence.';
 
 function getFieldValue<T>(result: ExtractFieldsResult, fieldId: keyof ExtractFieldsResult['fields']): T | null {
   return (result.fields[fieldId]?.value as T | null | undefined) ?? null;
@@ -44,10 +55,6 @@ function getFieldValue<T>(result: ExtractFieldsResult, fieldId: keyof ExtractFie
 
 function getDocumentKind(result: ExtractFieldsResult): string | null {
   return getFieldValue<string>(result, 'document.kind');
-}
-
-function isRulebookScopedDocument(result: ExtractFieldsResult): boolean {
-  return getDocumentKind(result) === 'residential_lease';
 }
 
 function getBoolean(result: ExtractFieldsResult, fieldId: keyof ExtractFieldsResult['fields']): boolean {
@@ -367,18 +374,139 @@ export const FLANDERS_RULES: RuleDefinition[] = [
   },
 ];
 
+export const FLANDERS_STUDENT_RULES: RuleDefinition[] = [
+  {
+    id: 'student-inventory-required',
+    clause: 'Student Entry Inventory',
+    severity: 'high',
+    explanation:
+      'Student leases in Flanders must have a detailed entry inventory under the student title of the Flemish Housing Rental Decree.',
+    sources: [SOURCES.student, SOURCES.studentCodex],
+    check(result) {
+      if (!getBoolean(result, 'inventory.waived')) {
+        return null;
+      }
+
+      return 'The student lease appears to waive or undermine the mandatory entry inventory.';
+    },
+  },
+  {
+    id: 'student-deposit-max-two-months-and-no-cash',
+    clause: 'Student Security Deposit',
+    severity: 'high',
+    explanation:
+      'For Flemish student leases, the rental guarantee may not exceed 2 months of rent. A cash handover is not allowed, while a blocked account or landlord-designated account can be valid.',
+    sources: [SOURCES.student, SOURCES.studentCodex],
+    check(result) {
+      const byMonths = getNumber(result, 'deposit.months');
+      if (byMonths !== null && byMonths > 2) {
+        return `The student lease asks for a security deposit of ${formatMonths(byMonths)} months, which exceeds the 2-month cap.`;
+      }
+
+      const depositAmount = getNumber(result, 'deposit.amount');
+      const rentAmount = getNumber(result, 'rent.baseAmount');
+      if (depositAmount !== null && rentAmount !== null && depositAmount > rentAmount * 2) {
+        return `The student lease asks for a security deposit of EUR ${depositAmount.toFixed(
+          2,
+        )}, which is more than 2 months of rent.`;
+      }
+
+      const depositMethod = getFieldValue<string>(result, 'deposit.method');
+      if (depositMethod === 'cash') {
+        return 'The student lease appears to require the deposit in cash, which is not allowed for Flemish student leases.';
+      }
+
+      return null;
+    },
+  },
+  {
+    id: 'student-no-silent-renewal',
+    clause: 'Student Renewal',
+    severity: 'high',
+    explanation:
+      'A Flemish student lease ends at the agreed end date and cannot be tacitly renewed by clause; continuation requires a new contract.',
+    sources: [SOURCES.student, SOURCES.studentCodex],
+    check(result) {
+      if (!getBoolean(result, 'renewal.auto')) {
+        return null;
+      }
+
+      return 'The student lease appears to allow tacit or automatic renewal, which is treated as unwritten under the student-lease rules.';
+    },
+  },
+  {
+    id: 'student-prestart-cancel-fee-max-two-months',
+    clause: 'Student Pre-Start Cancellation',
+    severity: 'high',
+    explanation:
+      'A student may terminate before the contract starts. If that happens less than 3 months before the start date, the compensation is capped at 2 months of rent.',
+    sources: [SOURCES.student, SOURCES.studentCodex],
+    check(result) {
+      const feeMonths = getNumber(result, 'termination.tenantPreStartFeeMonths');
+      if (feeMonths !== null && feeMonths > 2) {
+        return `The student lease sets a pre-start cancellation fee of ${formatMonths(
+          feeMonths,
+        )} months, above the 2-month statutory cap.`;
+      }
+
+      return null;
+    },
+  },
+  {
+    id: 'student-poststart-tenant-notice-max-two-months',
+    clause: 'Student Tenant Notice',
+    severity: 'high',
+    explanation:
+      'For the statutory student termination grounds after the contract starts, the student notice period is 2 months.',
+    sources: [SOURCES.student, SOURCES.studentCodex],
+    check(result) {
+      const tenantNotice = getNumber(result, 'notice.tenantMonths');
+      if (tenantNotice !== null && tenantNotice > 2) {
+        return `The student lease sets a tenant notice period of ${formatMonths(
+          tenantNotice,
+        )} months, above the 2-month student-lease notice period.`;
+      }
+
+      return null;
+    },
+  },
+  {
+    id: 'student-landlord-no-early-termination',
+    clause: 'Student Landlord Termination',
+    severity: 'high',
+    explanation:
+      'The Flemish guidance states that a landlord may not terminate a student lease early.',
+    sources: [SOURCES.student, SOURCES.studentCodex],
+    check(result) {
+      if (!getBoolean(result, 'termination.landlordEarlyAllowed')) {
+        return null;
+      }
+
+      return 'The student lease appears to give the landlord an early-termination right, but the student-lease rules do not allow landlord early termination.';
+    },
+  },
+];
+
+function getRulesForDocumentKind(documentKind: string | null): RuleDefinition[] {
+  if (documentKind === 'residential_lease') {
+    return FLANDERS_RULES;
+  }
+
+  if (documentKind === 'student_lease') {
+    return FLANDERS_STUDENT_RULES;
+  }
+
+  return [];
+}
+
 export function getRuleDefinition(ruleId: string): RuleDefinition | undefined {
-  return FLANDERS_RULES.find((rule) => rule.id === ruleId);
+  return [...FLANDERS_RULES, ...FLANDERS_STUDENT_RULES].find((rule) => rule.id === ruleId);
 }
 
 export function runRules(result: ExtractFieldsResult): Flag[] {
-  if (!isRulebookScopedDocument(result)) {
-    return [];
-  }
-
   const flags: Flag[] = [];
 
-  for (const rule of FLANDERS_RULES) {
+  for (const rule of getRulesForDocumentKind(getDocumentKind(result))) {
     const issue = rule.check(result);
 
     if (!issue) {

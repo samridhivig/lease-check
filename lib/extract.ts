@@ -108,6 +108,8 @@ interface ParsedLeaseSignals {
   leaseTermNote?: string;
   leaseTypeHint: 'short' | 'long' | null;
   durationClauses: ParsedDurationClause[];
+  tenantPreStartFeeMonths: number | null;
+  tenantPreStartFeeSnippet?: string;
   tenantEarlyTerminationForbidden: boolean;
   tenantEarlyTerminationForbiddenSnippet?: string;
   landlordEarlyTerminationAllowed: boolean;
@@ -323,6 +325,22 @@ function classifyClause(text: string): ClauseType {
     return 'insurance';
   }
 
+  if (
+    /opzeggingsmogelijkheden voor de huurder|opzegging door de huurder|huurder kan de huurovereenkomst|tegenopzeg|opzeggingstermijn|opzeggingsvergoeding|early termination|cancellation fee|notice period|be[eë]indiging van zijn studie/.test(
+      lower,
+    )
+  ) {
+    return 'tenant_termination';
+  }
+
+  if (
+    /opzeggingsmogelijkheden voor de verhuurder|opzegging door de verhuurder|verhuurder kan de huurovereenkomst|eigen betrekking|persoonlijk gebruik|renovatiewerken|verbouwingswerken|ongemotiveerde opzegging/.test(
+      lower,
+    )
+  ) {
+    return 'landlord_termination';
+  }
+
   if (/registr(?:atie|eren)|registration|enregistrement/.test(lower)) {
     return 'registration';
   }
@@ -344,22 +362,6 @@ function classifyClause(text: string): ClauseType {
   }
 
   if (
-    /opzeggingsmogelijkheden voor de huurder|opzegging door de huurder|huurder kan de huurovereenkomst|tegenopzeg/.test(
-      lower,
-    )
-  ) {
-    return 'tenant_termination';
-  }
-
-  if (
-    /opzeggingsmogelijkheden voor de verhuurder|opzegging door de verhuurder|verhuurder kan de huurovereenkomst|eigen betrekking|persoonlijk gebruik|renovatiewerken|verbouwingswerken|ongemotiveerde opzegging/.test(
-      lower,
-    )
-  ) {
-    return 'landlord_termination';
-  }
-
-  if (
     /duur van de huurovereenkomst|korte duur|negenjarig|9 jaar|lange duur|totale duur van de huur|wordt gesloten voor een duur/.test(
       lower,
     )
@@ -367,7 +369,7 @@ function classifyClause(text: string): ClauseType {
     return 'duration';
   }
 
-  if (/verlenging|stilzwijgende verlenging|wederinhuring|reconduction tacite/.test(lower)) {
+  if (/verlenging|stilzwijgende verlenging|tacit renewal|automatic renewal|wederinhuring|reconduction tacite/.test(lower)) {
     return 'renewal';
   }
 
@@ -1020,7 +1022,9 @@ function extractChargesModeSignal(clauses: DocumentClause[]): ParsedStringSignal
 function extractDepositMethodSignal(clauses: DocumentClause[]): ParsedStringSignal {
   const methods = new Map<string, string>();
   const patterns: Array<[string, RegExp]> = [
-    ['blocked_account', /ge[iï]ndividualiseerde rekening|huurwaarborgrekening|afzonderlijke huurwaarborgrekening/i],
+    ['cash', /cash|contant|in contanten|esp[eè]ces|hand cash/i],
+    ['landlord_account', /rekening van de verhuurder|door de verhuurder opgegeven rekening|landlord'?s account|account of the landlord|compte du bailleur/i],
+    ['blocked_account', /ge[iï]ndividualiseerde rekening|huurwaarborgrekening|afzonderlijke huurwaarborgrekening|individual and blocked guarantee account|blocked guarantee account/i],
     ['bank_guarantee', /zakelijke zekerheidstelling|bankwaarborg/i],
     ['ocmw_bank_guarantee', /ocmw/i],
     ['third_party_surety', /borgstelling door een natuurlijke persoon|borgstelling door een rechtspersoon/i],
@@ -1158,7 +1162,7 @@ function relevantTerminationClauses(
 ): DocumentClause[] {
   const actorPattern =
     actor === 'tenant'
-      ? /huurder kan de huurovereenkomst|opzeggingsmogelijkheden voor de huurder|opzegging door de huurder|de huurder kan/i
+      ? /huurder kan de huurovereenkomst|opzeggingsmogelijkheden voor de huurder|opzegging door de huurder|de huurder kan|early termination|cancellation fee|notice period|opzeggingstermijn|opzeggingsvergoeding|be[eë]indiging van zijn studie/i
       : /verhuurder kan de huurovereenkomst|opzeggingsmogelijkheden voor de verhuurder|opzegging door de verhuurder|de verhuurder kan/i;
 
   const base = clauses.filter((clause) => {
@@ -1213,7 +1217,7 @@ function extractDurationClauses(
 
   for (const clause of relevantClauses) {
     const noticeFragments = Array.from(
-      clause.normalized.matchAll(/(?:opzeggingstermijn|tegenopzeg(?:gen)?)[^.]{0,160}/gi),
+      clause.normalized.matchAll(/(?:opzeggingstermijn|tegenopzeg(?:gen)?|notice period|period of notice|preavis)[^.]{0,180}/gi),
     );
 
     for (const fragment of noticeFragments) {
@@ -1230,7 +1234,7 @@ function extractDurationClauses(
 
     const feeFragments = Array.from(
       clause.normalized.matchAll(
-        /(?:recht op een vergoeding|vergoeding is gelijk aan|vergoeding die gelijk is aan|betaling van een vergoeding)[^.]{0,220}/gi,
+        /(?:recht op een vergoeding|vergoeding is gelijk aan|vergoeding die gelijk is aan|betaling van een vergoeding|opzeggingsvergoeding|cancellation fee|termination fee|indemnity)[^.]{0,240}/gi,
       ),
     );
 
@@ -1369,6 +1373,24 @@ function parseSignals(text: string): ParsedLeaseSignals {
     ...extractDurationClauses(clauses, 'tenant', leaseTypeHint),
     ...extractDurationClauses(clauses, 'landlord', leaseTypeHint),
   ];
+  const tenantPreStartFee = captureDurationFromClauses(
+    clauses.filter((clause) =>
+      clause.type === 'tenant_termination' ||
+      /v[óo]or de inwerkingtreding|before commencement|before the start|pre-start|less than three months|minder dan drie maanden/i.test(
+        clause.normalized,
+      ),
+    ),
+    [
+      new RegExp(
+        `(?:opzeggingsvergoeding|cancellation fee|termination fee|fee|compensation|indemnity).{0,100}?(${DURATION_FRAGMENT_PATTERN}).{0,50}?(?:huur|rent|loyer)`,
+        'i',
+      ),
+      new RegExp(
+        `(${DURATION_FRAGMENT_PATTERN}).{0,50}?(?:huur|rent|loyer).{0,80}?(?:opzeggingsvergoeding|cancellation fee|termination fee|fee|compensation|indemnity)`,
+        'i',
+      ),
+    ],
+  );
 
   const tenantTerminationClauses = clausesOfType(clauses, 'tenant_termination');
   const landlordTerminationClauses = clausesOfType(clauses, 'landlord_termination');
@@ -1453,10 +1475,17 @@ function parseSignals(text: string): ParsedLeaseSignals {
       /(?:automatisch|automatically|de plein droit|van rechtswege).{0,120}?(?:ontbonden|beeindigd|terminated|resiliated?|resolu).{0,160}?(?:wanbetaling|non-payment|default|achterstallige huur|impay[eé])/i,
     ))
     .find(Boolean);
-  const autoRenewalSnippet = findSnippet(
+  const autoRenewalCandidateSnippet = findSnippet(
     normalized,
     /automatische\s+verlenging|stilzwijgende\s+verlenging|auto(?:matic)?[\s-]?renew(?:al)?|reconduction tacite/i,
   );
+  const autoRenewalSnippet =
+    autoRenewalCandidateSnippet &&
+    !/(?:niet|no|not|verbod|zonder dat|may not|cannot|kan niet|geen).{0,80}(?:stilzwijgend|automatic|renewal|verleng)/i.test(
+      autoRenewalCandidateSnippet,
+    )
+      ? autoRenewalCandidateSnippet
+      : undefined;
   const annexesSnippet = findSnippet(normalized, /(?:bijlage|bijlagen|annex(?:e|es)?).{0,40}/i);
 
   return {
@@ -1518,6 +1547,8 @@ function parseSignals(text: string): ParsedLeaseSignals {
     leaseTermNote: leaseTerm.note,
     leaseTypeHint,
     durationClauses,
+    tenantPreStartFeeMonths: tenantPreStartFee.value,
+    tenantPreStartFeeSnippet: tenantPreStartFee.snippet,
     tenantEarlyTerminationForbidden: Boolean(tenantEarlyTerminationForbiddenMatch.snippet),
     tenantEarlyTerminationForbiddenSnippet: tenantEarlyTerminationForbiddenMatch.snippet,
     landlordEarlyTerminationAllowed: Boolean(landlordEarlyTerminationAllowedMatch.snippet),
@@ -1943,6 +1974,10 @@ function buildAllFields(
     'notice.landlordFeeMonths': makeValue(landlordFeeMonths, {
       confidence: landlordFeeMonths === null ? 0.15 : 0.8,
       snippet: landlordFeeClause?.snippet,
+    }),
+    'termination.tenantPreStartFeeMonths': makeValue(signals.tenantPreStartFeeMonths, {
+      confidence: signals.tenantPreStartFeeMonths === null ? 0.15 : 0.78,
+      snippet: signals.tenantPreStartFeeSnippet,
     }),
     'termination.tenantEarlyForbidden': makeValue(signals.tenantEarlyTerminationForbidden, {
       confidence: signals.tenantEarlyTerminationForbidden ? 0.82 : 0.2,

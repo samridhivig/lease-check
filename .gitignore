@@ -38,5 +38,8 @@ yarn-error.log*
 next-env.d.ts
 
 # local fixture and tooling directories
-/scripts/
+/scripts/*
+!/scripts/analyze-fixtures.mjs
+!/scripts/check-fixtures.mjs
+!/scripts/build-rag-law-index.mjs
 /test-fixtures/

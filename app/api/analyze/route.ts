@@ -42,6 +42,7 @@ const FIELD_LABELS: Record<string, string> = {
   'notice.landlordMonths': 'Landlord notice period',
   'notice.tenantFeeMonths': 'Tenant break fee',
   'notice.landlordFeeMonths': 'Landlord break fee',
+  'termination.tenantPreStartFeeMonths': 'Student pre-start cancellation fee',
   'termination.landlordEarlyAllowed': 'Landlord early termination',
   'termination.autoForNonPayment': 'Auto-termination for non-payment',
   'registration.assignedToTenant': 'Registration assigned to tenant',
@@ -77,7 +78,13 @@ function formatFieldValue(key: string, field: ExtractedValue<unknown>): string {
   if (key === 'rent.indexationFrequencyMonths') return `Every ${v} months`;
   if (key === 'registration.deadlineMonths') return `${v} months`;
   if (key === 'notice.tenantMonths' || key === 'notice.landlordMonths') return `${v} months`;
-  if (key === 'notice.tenantFeeMonths' || key === 'notice.landlordFeeMonths') return `${v} months`;
+  if (
+    key === 'notice.tenantFeeMonths' ||
+    key === 'notice.landlordFeeMonths' ||
+    key === 'termination.tenantPreStartFeeMonths'
+  ) {
+    return `${v} months`;
+  }
   if (key === 'deposit.months') return `${v} months`;
   if (key === 'epc.score') return `${v} kWh/m²`;
   if (key === 'lease.type') {
@@ -112,6 +119,8 @@ function formatFieldValue(key: string, field: ExtractedValue<unknown>): string {
   if (key === 'deposit.method') {
     const methods: Record<string, string> = {
       blocked_account: 'Blocked account',
+      landlord_account: 'Landlord account',
+      cash: 'Cash',
       bank_guarantee: 'Bank guarantee',
       ocmw_bank_guarantee: 'OCMW bank guarantee',
       third_party_surety: 'Third-party surety',
@@ -186,7 +195,7 @@ function buildSummary(
     return 'The PDF did not contain readable text. No analysis could be performed.';
   }
 
-  if (documentKind && documentKind !== 'residential_lease') {
+  if (documentKind && documentKind !== 'residential_lease' && documentKind !== 'student_lease') {
     return 'This document appears to fall outside the current Flemish principal-residence residential lease scope, so the legal rule checks were not applied.';
   }
 
@@ -199,7 +208,9 @@ function buildSummary(
   }
 
   if (flags.length === 0) {
-    return 'No issues were flagged in this automated review. That does not guarantee the contract is compliant.';
+    return documentKind === 'student_lease'
+      ? 'No issues were flagged in this automated student-lease review. That does not guarantee the contract is compliant.'
+      : 'No issues were flagged in this automated review. That does not guarantee the contract is compliant.';
   }
 
   return `Found ${flags.length} potential issue${flags.length > 1 ? 's' : ''} in your lease. Please review the original clauses carefully.`;

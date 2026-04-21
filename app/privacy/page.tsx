@@ -8,9 +8,9 @@ export default function PrivacyPage() {
         <section className="space-y-4 text-sm text-gray-700 leading-relaxed">
           <h2 className="text-lg font-semibold text-gray-900">What LeaseCheck does</h2>
           <p>
-            LeaseCheck lets you upload a PDF of a rental contract. The app extracts text from
-            the PDF and checks it against Flemish tenancy law. It can also translate Dutch
-            contract text to English.
+            LeaseCheck lets you upload a PDF of a supported Flemish residential or student
+            lease. The app extracts text from the PDF and checks it against the relevant
+            Flemish tenancy rules. It can also translate Dutch contract text to English.
           </p>
 
           <h2 className="text-lg font-semibold text-gray-900">Your uploaded files</h2>

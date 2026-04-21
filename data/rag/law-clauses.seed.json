@@ -1,0 +1,662 @@
+{
+  "version": "2",
+  "scope": "be-flanders-residential-v1",
+  "references": [
+    {
+      "id": "registration-law-article-11",
+      "kind": "law_article",
+      "topic": "registration",
+      "title": "Codex Vlaanderen - artikel 11 - registratieplicht",
+      "language": "nl",
+      "ruleIds": ["registration-by-landlord-within-two-months"],
+      "text": "Artikel 11 van het Vlaams Woninghuurdecreet legt de registratieplicht voor de woninghuurovereenkomst en de plaatsbeschrijving bij de verhuurder. Die registratie moet gebeuren binnen twee maanden na ondertekening.",
+      "keywords": ["artikel 11", "registratie", "twee maanden", "verhuurder", "plaatsbeschrijving"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "registration-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "registration",
+      "title": "Vlaanderen.be - Woninghuurovereenkomst sluiten - registratie",
+      "language": "nl",
+      "ruleIds": ["registration-by-landlord-within-two-months"],
+      "text": "De Vlaamse guidance zegt dat de verhuurder de woninghuurovereenkomst en de plaatsbeschrijving moet laten registreren binnen twee maanden. Een clausule die de huurder verantwoordelijk maakt of meer tijd toelaat, wijkt af van die guidance.",
+      "keywords": ["guidance", "registratie", "verhuurder", "twee maanden"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Woninghuurovereenkomst sluiten",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/woninghuurovereenkomst-sluiten"
+        }
+      ]
+    },
+    {
+      "id": "registration-explanation",
+      "kind": "supporting_explanation",
+      "topic": "registration",
+      "title": "Praktische uitleg - registratiebeding",
+      "language": "nl",
+      "ruleIds": ["registration-by-landlord-within-two-months"],
+      "text": "Als een leaseclausule zegt dat de huurder zelf moet registreren, de kosten van laattijdige registratie draagt, of een registratietermijn van meer dan twee maanden aanvaardt, is dat een duidelijke rode vlag voor dit onderwerp.",
+      "keywords": ["huurder registreert", "laattijdige registratie", "meer dan twee maanden"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "inventory-law-article-9",
+      "kind": "law_article",
+      "topic": "inventory",
+      "title": "Codex Vlaanderen - artikel 9 - plaatsbeschrijving",
+      "language": "nl",
+      "ruleIds": ["inventory-cannot-be-waived"],
+      "text": "Artikel 9 van het Vlaams Woninghuurdecreet vereist een omstandige plaatsbeschrijving bij de aanvang van de huur. Die moet op tegenspraak en voor gemeenschappelijke rekening worden opgemaakt.",
+      "keywords": ["artikel 9", "plaatsbeschrijving", "omstandig", "tegenspraak"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "inventory-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "inventory",
+      "title": "Vlaanderen.be - Woninghuurovereenkomst sluiten - plaatsbeschrijving",
+      "language": "nl",
+      "ruleIds": ["inventory-cannot-be-waived"],
+      "text": "De Vlaamse guidance legt uit dat er bij de start van de huur een gedetailleerde plaatsbeschrijving moet zijn. Een contract dat zegt dat er geen plaatsbeschrijving komt of dat de huurder het goed louter in huidige staat aanvaardt, botst met die guidance.",
+      "keywords": ["plaatsbeschrijving", "huidige staat", "as is"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Woninghuurovereenkomst sluiten",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/woninghuurovereenkomst-sluiten"
+        }
+      ]
+    },
+    {
+      "id": "inventory-explanation",
+      "kind": "supporting_explanation",
+      "topic": "inventory",
+      "title": "Praktische uitleg - inventory waiver",
+      "language": "nl",
+      "ruleIds": ["inventory-cannot-be-waived"],
+      "text": "Voor dit onderwerp zijn zinnen als 'zonder plaatsbeschrijving', 'as is', 'in de staat waarin het zich bevindt' of 'de huurder aanvaardt het pand in huidige staat' vaak de relevante signalen. Die taal kan erop wijzen dat de inventaris feitelijk wordt uitgesloten of uitgehold.",
+      "keywords": ["zonder plaatsbeschrijving", "as is", "huidige staat"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "fire-insurance-law-article-29",
+      "kind": "law_article",
+      "topic": "fire_insurance",
+      "title": "Codex Vlaanderen - artikel 29 - brandverzekering",
+      "language": "nl",
+      "ruleIds": ["fire-insurance-should-cover-both-parties"],
+      "text": "Artikel 29 van het Vlaams Woninghuurdecreet verplicht zowel huurder als verhuurder om verzekerd te zijn tegen brand- en waterschade voor hun aansprakelijkheid. De wettelijke verplichting rust dus op beide partijen.",
+      "keywords": ["artikel 29", "brandverzekering", "waterschade", "huurder", "verhuurder"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "fire-insurance-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "fire_insurance",
+      "title": "Vlaanderen.be - Woninghuurovereenkomst sluiten - brandverzekering",
+      "language": "nl",
+      "ruleIds": ["fire-insurance-should-cover-both-parties"],
+      "text": "De Vlaamse guidance zegt dat sinds 1 januari 2019 zowel huurder als verhuurder een brandverzekering moeten hebben. Als het contract maar een partij noemt, is minstens een manuele controle aangewezen.",
+      "keywords": ["brandverzekering", "beide partijen", "manuele controle"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Woninghuurovereenkomst sluiten",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/woninghuurovereenkomst-sluiten"
+        }
+      ]
+    },
+    {
+      "id": "fire-insurance-explanation",
+      "kind": "supporting_explanation",
+      "topic": "fire_insurance",
+      "title": "Praktische uitleg - brandverzekering beide partijen",
+      "language": "nl",
+      "ruleIds": ["fire-insurance-should-cover-both-parties"],
+      "text": "Voor deterministische extractie van een leaseclausule is het relevant of de tekst alleen de huurder noemt, alleen de verhuurder noemt, of beide partijen expliciet noemt. De RAG-extractor beslist niet of de clausule wettig is, maar legt alleen vast welke partijverplichtingen in de tekst staan.",
+      "keywords": ["huurder", "verhuurder", "beide partijen", "clausule extractie"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "property-tax-law-article-36",
+      "kind": "law_article",
+      "topic": "property_tax",
+      "title": "Codex Vlaanderen - artikel 36 §1 - onroerende voorheffing",
+      "language": "nl",
+      "ruleIds": ["property-tax-cannot-be-charged-to-tenant"],
+      "text": "Artikel 36, paragraaf 1, verhindert dat de onroerende voorheffing voor de verhuurde woning op de huurder wordt afgewenteld. Een contractuele doorgifte van die belasting aan de huurder is dus strijdig met de wettelijke regeling.",
+      "keywords": ["artikel 36", "onroerende voorheffing", "huurder", "belasting"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "property-tax-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "property_tax",
+      "title": "Vlaanderen.be - Kosten en lasten - onroerende voorheffing",
+      "language": "nl",
+      "ruleIds": ["property-tax-cannot-be-charged-to-tenant"],
+      "text": "De Vlaamse guidance over kosten en lasten zegt dat de onroerende voorheffing ten laste van de verhuurder blijft. Een leaseclausule die property tax of precompte immobilier bij de huurder legt, wijkt daar dus van af.",
+      "keywords": ["kosten en lasten", "onroerende voorheffing", "property tax", "precompte immobilier"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Kosten en lasten",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/huurprijs-en-huurwaarborg/kosten-en-lasten"
+        }
+      ]
+    },
+    {
+      "id": "property-tax-explanation",
+      "kind": "supporting_explanation",
+      "topic": "property_tax",
+      "title": "Praktische uitleg - property tax clause",
+      "language": "nl",
+      "ruleIds": ["property-tax-cannot-be-charged-to-tenant"],
+      "text": "Voor dit onderwerp kijkt de RAG-extractor of de lease expliciet zegt dat de huurder de onroerende voorheffing, property tax of precompte immobilier betaalt of terugbetaalt.",
+      "keywords": ["ten laste van de huurder", "property tax", "precompte immobilier", "terugbetalen"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "non-payment-law-process",
+      "kind": "law_article",
+      "topic": "non_payment_termination",
+      "title": "Wettelijk proces - geen automatische ontbinding door clausule",
+      "language": "nl",
+      "ruleIds": ["no-automatic-termination-for-non-payment"],
+      "text": "Het relevante juridische uitgangspunt is dat een lease niet louter door een contractclausule van rechtswege eindigt bij niet-betaling. Ontbinding en uithuiszetting vereisen een wettig proces en kunnen niet eenzijdig door de verhuurder worden uitgevoerd.",
+      "keywords": ["van rechtswege", "ontbinding", "uithuiszetting", "niet-betaling"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "non-payment-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "non_payment_termination",
+      "title": "Vlaanderen.be - De huurprijs - wanbetaling",
+      "language": "nl",
+      "ruleIds": ["no-automatic-termination-for-non-payment"],
+      "text": "De Vlaamse guidance zegt dat de verhuurder het contract niet zelf kan ontbinden of de huurder niet zelf kan buitenzetten wegens wanbetaling. Een clausule die automatische beeindiging of directe uitzetting vermeldt, is dus een duidelijke rode vlag.",
+      "keywords": ["wanbetaling", "niet zelf ontbinden", "niet zelf buitenzetten"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - De huurprijs",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/huurprijs-en-huurwaarborg/de-huurprijs"
+        }
+      ]
+    },
+    {
+      "id": "non-payment-explanation",
+      "kind": "supporting_explanation",
+      "topic": "non_payment_termination",
+      "title": "Praktische uitleg - automatic termination for non-payment",
+      "language": "nl",
+      "ruleIds": ["no-automatic-termination-for-non-payment"],
+      "text": "Voor deterministische extractie zijn woorden zoals 'automatisch ontbonden', 'van rechtswege beeindigd', 'automatic termination', 'resiliation automatique' en directe verlies-van-bewoningsrechten de relevante signalen. De RAG-extractor stelt vast of de lease dat soort automatische gevolgen beweert.",
+      "keywords": ["automatisch ontbonden", "van rechtswege beeindigd", "automatic termination", "resiliation automatique"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "rent-indexation-law-article-34",
+      "kind": "law_article",
+      "topic": "rent_indexation",
+      "title": "Codex Vlaanderen - artikel 34 - huurindexatie",
+      "language": "nl",
+      "ruleIds": ["indexation-not-more-than-annual-and-not-automatic"],
+      "text": "Artikel 34 laat indexatie slechts eenmaal per huurjaar toe, vanaf de verjaardag van de inwerkingtreding en op schriftelijk verzoek. De bepaling ondersteunt dus geen maandelijkse, driemaandelijkse of automatische indexatie.",
+      "keywords": ["artikel 34", "huurindexatie", "eenmaal per huurjaar", "schriftelijk verzoek"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "rent-indexation-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "rent_indexation",
+      "title": "Vlaanderen.be - De huurprijs - indexatie",
+      "language": "nl",
+      "ruleIds": ["indexation-not-more-than-annual-and-not-automatic"],
+      "text": "De Vlaamse guidance legt uit dat indexatie niet automatisch gebeurt en slechts eenmaal per huurjaar kan worden gevraagd. Als een contract het voorstelt als automatisch of vaker dan jaarlijks, is dat precies het extractiesignaal voor dit onderwerp.",
+      "keywords": ["indexatie", "niet automatisch", "eenmaal per huurjaar", "jaarlijks"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - De huurprijs",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/huurprijs-en-huurwaarborg/de-huurprijs"
+        }
+      ]
+    },
+    {
+      "id": "rent-indexation-explanation",
+      "kind": "supporting_explanation",
+      "topic": "rent_indexation",
+      "title": "Praktische uitleg - indexatieclausule",
+      "language": "nl",
+      "ruleIds": ["indexation-not-more-than-annual-and-not-automatic"],
+      "text": "Voor dit onderwerp beantwoordt de RAG-extractor twee feitelijke vragen: welke frequentie noemt de lease, en zegt de lease dat indexatie automatisch gebeurt. Ook formuleringen zoals 'jaarlijks', 'elk jaar', 'monthly', 'quarterly', 'automatisch', of 'op eerste verzoek' zijn relevant.",
+      "keywords": ["jaarlijks", "maandelijks", "quarterly", "automatisch"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "deposit-handling-law-article-37",
+      "kind": "law_article",
+      "topic": "deposit_handling",
+      "title": "Codex Vlaanderen - artikel 37 - huurwaarborgvormen",
+      "language": "nl",
+      "ruleIds": ["deposit-not-held-by-landlord"],
+      "text": "Artikel 37 regelt de geoorloofde vormen van huurwaarborg. Het uitgangspunt is dat de waarborg niet simpelweg als cash of op de eigen rekening van de verhuurder blijft staan; zulke constructies hebben interestgevolgen en zijn een rode vlag in de contracttekst.",
+      "keywords": ["artikel 37", "huurwaarborg", "cash", "eigen rekening van verhuurder"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "deposit-handling-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "deposit_handling",
+      "title": "Vlaanderen.be - Huurwaarborg - persoonlijke rekening of cash",
+      "language": "nl",
+      "ruleIds": ["deposit-not-held-by-landlord"],
+      "text": "De Vlaamse guidance waarschuwt dat de verhuurder de waarborg niet gewoon in cash of op de eigen rekening mag houden. Een clausule waarin de verhuurder de waarborg rechtstreeks ontvangt of bewaart, is daarom precies het type formulering dat hier moet worden opgemerkt.",
+      "keywords": ["cash", "eigen rekening", "waarborg rechtstreeks ontvangen"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Huurwaarborg",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/huurprijs-en-huurwaarborg/huurwaarborg"
+        }
+      ]
+    },
+    {
+      "id": "deposit-handling-explanation",
+      "kind": "supporting_explanation",
+      "topic": "deposit_handling",
+      "title": "Praktische uitleg - landlord-held deposit",
+      "language": "nl",
+      "ruleIds": ["deposit-not-held-by-landlord"],
+      "text": "Voor deze extractie zijn formuleringen belangrijk zoals 'cash betaald aan de verhuurder', 'blijft op rekening van de verhuurder', 'wordt door de verhuurder bijgehouden' of equivalente Engelse of Franse taal. De RAG-extractor stelt enkel vast of de clausule dat soort direct landlord-held deposit beschrijft.",
+      "keywords": ["cash betaald", "rekening van de verhuurder", "door de verhuurder bijgehouden"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "tenant-termination-short-law-article-21",
+      "kind": "law_article",
+      "topic": "tenant_termination",
+      "title": "Codex Vlaanderen - artikel 21 §2 - korte duur opzegging huurder",
+      "language": "nl",
+      "ruleIds": ["short-lease-tenant-notice-max-three-months", "short-lease-tenant-fee-max-one-and-a-half-months"],
+      "text": "Artikel 21, paragraaf 2, geeft de huurder bij een huur van korte duur het recht om vroegtijdig op te zeggen met drie maanden opzeg. De vergoeding is begrensd tot anderhalve maand in jaar een, een maand in jaar twee en een halve maand in jaar drie.",
+      "keywords": ["artikel 21", "korte duur", "drie maanden opzeg", "anderhalve maand", "vroege opzegging"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "tenant-termination-short-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "tenant_termination",
+      "title": "Vlaanderen.be - Einde en opzegging - korte duur door huurder",
+      "language": "nl",
+      "ruleIds": ["short-lease-tenant-notice-max-three-months", "short-lease-tenant-fee-max-one-and-a-half-months"],
+      "text": "De Vlaamse guidance zegt voor post-2019 korte huur dat de huurder altijd kan opzeggen met drie maanden opzeg. Ze legt ook uit dat de verbrekingsvergoeding daalt per jaar en nooit boven anderhalve maand start.",
+      "keywords": ["korte duur", "drie maanden opzeg", "verbrekingsvergoeding"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Einde en opzegging van het huurcontract",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/einde-en-opzegging-van-het-huurcontract"
+        }
+      ]
+    },
+    {
+      "id": "tenant-termination-short-explanation",
+      "kind": "supporting_explanation",
+      "topic": "tenant_termination",
+      "title": "Praktische uitleg - korte duur tenant termination",
+      "language": "nl",
+      "ruleIds": ["short-lease-tenant-notice-max-three-months", "short-lease-tenant-fee-max-one-and-a-half-months"],
+      "text": "Als de clause zelf spreekt over een huurder die niet mag opzeggen, een opzegtermijn langer dan drie maanden, of een generieke boete boven anderhalve maand huur, dan zijn dat de relevante velden om uit de lease te halen. De RAG-extractor stelt enkel vast wat de lease clausule zegt.",
+      "keywords": ["huurder kan niet opzeggen", "langer dan drie maanden", "boete boven anderhalve maand"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "tenant-termination-long-law-article-20",
+      "kind": "law_article",
+      "topic": "tenant_termination",
+      "title": "Codex Vlaanderen - artikel 20 §1 - lange duur opzegging huurder",
+      "language": "nl",
+      "ruleIds": ["long-lease-tenant-notice-max-three-months", "long-lease-tenant-fee-max-three-months"],
+      "text": "Artikel 20, paragraaf 1, bepaalt dat de huurder bij een negenjarige of langere huur op elk ogenblik mag opzeggen met drie maanden opzeg. Als de huurder vertrekt tijdens de eerste drie jaar, is de vergoeding begrensd tot drie, twee of een maand huur.",
+      "keywords": ["artikel 20", "negenjarige huur", "drie maanden opzeg", "drie twee een maand"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "tenant-termination-long-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "tenant_termination",
+      "title": "Vlaanderen.be - Einde en opzegging - negenjarige huur door huurder",
+      "language": "nl",
+      "ruleIds": ["long-lease-tenant-notice-max-three-months", "long-lease-tenant-fee-max-three-months"],
+      "text": "De Vlaamse guidance zegt dat de huurder bij een negenjarige huur op elk moment mag opzeggen met drie maanden opzeg. Voor de eerste drie jaar bestaat een dalende vergoeding van drie, twee en een maand huur.",
+      "keywords": ["negenjarige huur", "drie maanden opzeg", "drie twee een maand"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Einde en opzegging van het huurcontract",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/einde-en-opzegging-van-het-huurcontract"
+        }
+      ]
+    },
+    {
+      "id": "tenant-termination-long-explanation",
+      "kind": "supporting_explanation",
+      "topic": "tenant_termination",
+      "title": "Praktische uitleg - lange duur tenant termination",
+      "language": "nl",
+      "ruleIds": ["long-lease-tenant-notice-max-three-months", "long-lease-tenant-fee-max-three-months"],
+      "text": "Voor een tenant termination-clausule zijn de kernvragen: welke opzegtermijn staat er voor de huurder, welke vergoeding staat er voor de huurder, en verbiedt de clause vroegtijdige opzegging. De deterministische extractie legt die ruwe leasefeiten vast zonder wettigheid te beslissen.",
+      "keywords": ["opzegtermijn huurder", "vergoeding huurder", "vroegtijdige opzegging"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "landlord-termination-short-law-article-21",
+      "kind": "law_article",
+      "topic": "landlord_termination",
+      "title": "Codex Vlaanderen - artikel 21 §1 - geen algemene vroegtijdige opzeg door verhuurder bij korte duur",
+      "language": "nl",
+      "ruleIds": ["short-lease-no-landlord-early-termination"],
+      "text": "Artikel 21, paragraaf 1, sluit voor huur van korte duur de gewone vroegtijdige opzeggingsgronden van de verhuurder uit. Daardoor heeft de verhuurder geen algemene wettelijke mogelijkheid om een korte huur zomaar vroegtijdig te beeindigen.",
+      "keywords": ["artikel 21", "korte duur", "verhuurder", "geen algemene opzegmogelijkheid"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "landlord-termination-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "landlord_termination",
+      "title": "Vlaanderen.be - Einde en opzegging - verhuurder bij korte duur",
+      "language": "nl",
+      "ruleIds": ["short-lease-no-landlord-early-termination"],
+      "text": "De Vlaamse guidance zegt uitdrukkelijk dat de verhuurder bij een post-2019 huur van korte duur geen wettelijke opzegmogelijkheden heeft. Een clause die toch een brede opzeggingsmacht aan de verhuurder geeft, is precies het soort clause dat de RAG-extractor moet herkennen.",
+      "keywords": ["verhuurder", "geen wettelijke opzegmogelijkheden", "korte duur"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Einde en opzegging van het huurcontract",
+          "url": "https://www.vlaanderen.be/bouwen-wonen-en-energie/huren-en-verhuren/einde-en-opzegging-van-het-huurcontract"
+        }
+      ]
+    },
+    {
+      "id": "landlord-termination-explanation",
+      "kind": "supporting_explanation",
+      "topic": "landlord_termination",
+      "title": "Praktische uitleg - landlord early termination clause",
+      "language": "nl",
+      "ruleIds": ["short-lease-no-landlord-early-termination"],
+      "text": "Voor landlord termination is de relevante extractievraag of de lease clausule de verhuurder een vroegtijdig opzeggingsrecht geeft, en zo ja onder welke voorwaarden en termijnen. De RAG-extractor legt die clausuletaal expliciet vast, niet de juridische uitkomst.",
+      "keywords": ["vroegtijdig opzeggingsrecht", "verhuurder", "voorwaarden", "termijnen"],
+      "sources": [
+        {
+          "label": "Flanders Residential Lease Research",
+          "url": "docs/FLANDERS_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "student-deposit-law-article-62",
+      "kind": "law_article",
+      "topic": "deposit_handling",
+      "title": "Codex Vlaanderen - artikel 62 - huurwaarborg bij studentenhuur",
+      "language": "nl",
+      "ruleIds": ["student-deposit-max-two-months-and-no-cash"],
+      "text": "Artikel 62 van het Vlaams Woninghuurdecreet bepaalt dat de waarborg bij studentenhuur maximaal twee maanden huur mag bedragen. Een geldsom wordt geplaatst op een geindividualiseerde rekening op naam van de huurder of gestort op een door de verhuurder opgegeven rekening.",
+      "keywords": ["studentenhuur", "huurwaarborg", "twee maanden", "rekening verhuurder", "geindividualiseerde rekening"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "student-deposit-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "deposit_handling",
+      "title": "Vlaanderen.be - Studentenhuurovereenkomsten - huurwaarborg",
+      "language": "nl",
+      "ruleIds": ["student-deposit-max-two-months-and-no-cash"],
+      "text": "De Vlaamse studentenguidance zegt dat de huurwaarborg voor studenten maximaal twee maanden huur bedraagt. De waarborg mag op een geblokkeerde rekening op naam van de huurder of op een rekening van de verhuurder staan, maar cash overhandigen is niet toegestaan.",
+      "keywords": ["student", "waarborg", "maximaal 2 maanden", "cash niet toegestaan"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Studentenhuurovereenkomsten",
+          "url": "https://www.vlaanderen.be/studentenhuurovereenkomsten"
+        }
+      ]
+    },
+    {
+      "id": "student-deposit-explanation",
+      "kind": "supporting_explanation",
+      "topic": "deposit_handling",
+      "title": "Praktische uitleg - student deposit",
+      "language": "nl",
+      "ruleIds": ["student-deposit-max-two-months-and-no-cash"],
+      "text": "Voor student deposits is een landlord account niet automatisch fout. De extractor moet vooral deposit months, rent amount, cash language, blocked-account language and landlord-account language bewaren zodat de student rulebook later de juiste toets kan doen.",
+      "keywords": ["student deposit", "cash", "landlord account", "blocked account", "two months"],
+      "sources": [
+        {
+          "label": "Flanders Student Lease Research",
+          "url": "docs/FLANDERS_STUDENT_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "student-renewal-law-article-63",
+      "kind": "law_article",
+      "topic": "renewal",
+      "title": "Codex Vlaanderen - artikel 63 - verbod op stilzwijgende verlenging",
+      "language": "nl",
+      "ruleIds": ["student-no-silent-renewal"],
+      "text": "Artikel 63 van het Vlaams Woninghuurdecreet bepaalt dat een studentenhuurovereenkomst eindigt na de overeengekomen duur. Een beding dat de overeenkomst stilzwijgend verlengt als er niet uitdrukkelijk wordt opgezegd, wordt voor niet geschreven gehouden.",
+      "keywords": ["studentenhuur", "stilzwijgende verlenging", "einddatum", "nieuw contract"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "student-renewal-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "renewal",
+      "title": "Vlaanderen.be - Studentenhuurovereenkomsten - einde en verlenging",
+      "language": "nl",
+      "ruleIds": ["student-no-silent-renewal"],
+      "text": "De Vlaamse guidance zegt dat een studentenhuurovereenkomst automatisch eindigt op de einddatum en niet mag bepalen dat de overeenkomst stilzwijgend wordt verlengd. Als partijen willen verderzetten, moeten ze een nieuwe overeenkomst sluiten.",
+      "keywords": ["student", "einddatum", "geen stilzwijgende verlenging", "nieuwe overeenkomst"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Studentenhuurovereenkomsten",
+          "url": "https://www.vlaanderen.be/studentenhuurovereenkomsten"
+        }
+      ]
+    },
+    {
+      "id": "student-renewal-explanation",
+      "kind": "supporting_explanation",
+      "topic": "renewal",
+      "title": "Praktische uitleg - student renewal",
+      "language": "nl",
+      "ruleIds": ["student-no-silent-renewal"],
+      "text": "Voor student renewal is de extractievraag of de lease een positieve tacit renewal of automatic renewal toestaat. Negatieve taal zoals 'no tacit renewal' of 'zonder stilzwijgende verlenging' is juist compliant evidence en mag niet als automatisch verlengen worden genormaliseerd.",
+      "keywords": ["student renewal", "no tacit renewal", "geen stilzwijgende verlenging", "automatic renewal"],
+      "sources": [
+        {
+          "label": "Flanders Student Lease Research",
+          "url": "docs/FLANDERS_STUDENT_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "student-termination-law-article-64",
+      "kind": "law_article",
+      "topic": "tenant_termination",
+      "title": "Codex Vlaanderen - artikel 64 - beëindiging studentenhuurovereenkomst",
+      "language": "nl",
+      "ruleIds": ["student-prestart-cancel-fee-max-two-months", "student-poststart-tenant-notice-max-two-months"],
+      "text": "Artikel 64 van het Vlaams Woninghuurdecreet laat de student de overeenkomst beëindigen vóór de inwerkingtreding, bij beëindiging van de studie of bij overlijden van een onderhoudspersoon. Bij beëindiging minder dan drie maanden voor de start is twee maanden huur vergoeding verschuldigd; bij de studie- en overlijdensgronden geldt een opzegtermijn van twee maanden.",
+      "keywords": ["student", "voor inwerkingtreding", "twee maanden", "opzegtermijn", "opzeggingsvergoeding"],
+      "sources": [
+        {
+          "label": "Codex Vlaanderen - Vlaams Woninghuurdecreet",
+          "url": "https://codex.vlaanderen.be/PrintDocument.ashx?id=1029963"
+        }
+      ]
+    },
+    {
+      "id": "student-termination-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "tenant_termination",
+      "title": "Vlaanderen.be - Studentenhuurovereenkomsten - opzeg door student",
+      "language": "nl",
+      "ruleIds": ["student-prestart-cancel-fee-max-two-months", "student-poststart-tenant-notice-max-two-months"],
+      "text": "De Vlaamse studentenguidance zegt dat de student voor de start kan opzeggen. Meer dan drie maanden voor de start kan dat kosteloos; minder dan drie maanden voor de start geldt een vergoeding van twee maanden huur. Na stopzetting van de studies of overlijden van een onderhoudspersoon geldt een opzegtermijn van twee maanden.",
+      "keywords": ["student", "opzeg voor start", "kosteloos", "minder dan drie maanden", "twee maanden"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Studentenhuurovereenkomsten",
+          "url": "https://www.vlaanderen.be/studentenhuurovereenkomsten"
+        }
+      ]
+    },
+    {
+      "id": "student-termination-explanation",
+      "kind": "supporting_explanation",
+      "topic": "tenant_termination",
+      "title": "Praktische uitleg - student tenant termination",
+      "language": "nl",
+      "ruleIds": ["student-prestart-cancel-fee-max-two-months", "student-poststart-tenant-notice-max-two-months"],
+      "text": "Voor student tenant termination bewaart de extractor twee kernfeiten: de pre-start cancellation fee in months of rent, and the post-start notice period. De legal rulebook flags only values above the statutory two-month thresholds.",
+      "keywords": ["student termination", "pre-start cancellation fee", "two months notice", "opzeggingsvergoeding"],
+      "sources": [
+        {
+          "label": "Flanders Student Lease Research",
+          "url": "docs/FLANDERS_STUDENT_RULE_RESEARCH.md"
+        }
+      ]
+    },
+    {
+      "id": "student-landlord-termination-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "landlord_termination",
+      "title": "Vlaanderen.be - Studentenhuurovereenkomsten - geen vroegtijdige opzeg door verhuurder",
+      "language": "nl",
+      "ruleIds": ["student-landlord-no-early-termination"],
+      "text": "De Vlaamse studentenguidance zegt uitdrukkelijk dat de verhuurder de studentenhuurovereenkomst niet vroegtijdig mag opzeggen.",
+      "keywords": ["student", "verhuurder", "niet vroegtijdig opzeggen", "landlord early termination"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Studentenhuurovereenkomsten",
+          "url": "https://www.vlaanderen.be/studentenhuurovereenkomsten"
+        }
+      ]
+    },
+    {
+      "id": "student-inventory-guidance-vlaanderen",
+      "kind": "guidance_page",
+      "topic": "inventory",
+      "title": "Vlaanderen.be - Studentenhuurovereenkomsten - plaatsbeschrijving",
+      "language": "nl",
+      "ruleIds": ["student-inventory-required"],
+      "text": "De Vlaamse studentenguidance zegt dat huurder en verhuurder samen verplicht een gedetailleerde plaatsbeschrijving opmaken bij het begin van de huur. Die moet tijdig, gedateerd en door beide partijen ondertekend zijn.",
+      "keywords": ["student", "plaatsbeschrijving", "verplicht", "gedetailleerd", "begin van de huur"],
+      "sources": [
+        {
+          "label": "Vlaanderen.be - Studentenhuurovereenkomsten",
+          "url": "https://www.vlaanderen.be/studentenhuurovereenkomsten"
+        }
+      ]
+    }
+  ]
+}

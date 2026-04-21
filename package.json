@@ -8,7 +8,8 @@
     "start": "next start",
     "fixtures:advo-recht": "node scripts/fetch-advo-recht-contracts.mjs",
     "analyze:fixtures": "node scripts/analyze-fixtures.mjs",
-    "test:fixtures": "node scripts/check-fixtures.mjs"
+    "test:fixtures": "node scripts/check-fixtures.mjs",
+    "rag:build-law-index": "node scripts/build-rag-law-index.mjs"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.0.1",

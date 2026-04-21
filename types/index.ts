@@ -91,6 +91,7 @@ export type LeaseFieldId =
   | 'notice.landlordMonths'
   | 'notice.tenantFeeMonths'
   | 'notice.landlordFeeMonths'
+  | 'termination.tenantPreStartFeeMonths'
   | 'termination.tenantEarlyForbidden'
   | 'termination.landlordEarlyAllowed'
   | 'termination.autoForNonPayment'

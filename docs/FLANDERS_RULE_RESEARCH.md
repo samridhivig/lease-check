@@ -484,4 +484,4 @@ Useful official brochure:
 2. Add a second layer called "manual review rules" for medium-confidence checks.
 3. Add explicit scope detection for Flanders, main residence, and post-1 January 2019 contracts.
 4. Add fixtures with Dutch, French, and English clause variants for each hard rule.
-5. Add a separate rulebook later for student leases, because their termination and deposit logic differ.
+5. Keep student leases in the separate student rulebook documented in `docs/FLANDERS_STUDENT_RULE_RESEARCH.md`, because their termination and deposit logic differ.
