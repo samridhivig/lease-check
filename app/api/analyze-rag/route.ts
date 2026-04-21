@@ -192,24 +192,24 @@ function buildSummary(
   documentKind: string | null,
 ): string {
   if (textIsEmpty) {
-    return 'The PDF did not contain readable text. No RAG clause analysis could be performed.';
+    return 'The PDF did not contain readable text. No analysis could be performed.';
   }
 
   if (documentKind && documentKind !== 'residential_lease' && documentKind !== 'student_lease') {
-    return 'This experimental RAG analyzer could not confidently place the document inside the Flemish residential lease scope.';
+    return 'This document appears to fall outside the current Flemish residential and student lease scope, so the legal rule checks were not applied.';
   }
 
   if (meta.foundFields < 3) {
-    return 'The experimental RAG analyzer found only a few clause signals. Compare against the current analyzer before relying on these results.';
+    return `We could only extract ${meta.foundFields} fields \u2014 results may be incomplete. Review the full document with a legal professional.`;
   }
 
   if (flags.length === 0) {
     return documentKind === 'student_lease'
-      ? 'The experimental RAG analyzer did not flag any issues in this student lease. It combines the current scalar regex extraction with deterministic RAG clause extraction, so compare it against the baseline analyzer before relying on it.'
-      : 'The experimental RAG analyzer did not flag any issues. It combines the current scalar regex extraction with deterministic RAG clause extraction, so compare it against the baseline analyzer before relying on it.';
+      ? 'No issues were flagged in this automated student-lease review. That does not guarantee the contract is compliant.'
+      : 'No issues were flagged in this automated review. That does not guarantee the contract is compliant.';
   }
 
-  return `The experimental RAG analyzer found ${flags.length} potential issue${flags.length > 1 ? 's' : ''}. Compare these results with the current analyzer before drawing conclusions.`;
+  return `Found ${flags.length} potential issue${flags.length > 1 ? 's' : ''} in your lease. Please review the original clauses carefully.`;
 }
 
 function getClientIp(req: NextRequest): string {
