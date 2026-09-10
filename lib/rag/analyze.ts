@@ -1,11 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import pdf from 'pdf-parse';
 import { mapExplanations } from '@/lib/explanations';
 import { extractRagClauses } from '@/lib/rag/clause-extract';
-import { ensureLawClauseIndexRegistered } from '@/lib/rag/law-corpus';
 import { buildMergedExtractionResult, extractScalarRegexFields, mergeFieldMaps } from '@/lib/rag/scalar';
-import { rateLimiter } from '@/lib/rate-limit';
 import { runRules } from '@/lib/rules';
+import type { EmbeddedClauseRecord } from '@/lib/rag/retrieve';
 import type {
   AnalysisResult,
   ExtractionMeta,
@@ -16,7 +13,7 @@ import type {
   LeaseFieldId,
 } from '@/types';
 
-const MAX_FILE_SIZE = 4.5 * 1024 * 1024;
+import rawLawIndex from '@/data/rag/law-index.json';
 
 const FIELD_LABELS: Partial<Record<LeaseFieldId, string>> = {
   'document.kind': 'Document kind',
@@ -212,63 +209,66 @@ function buildSummary(
   return `Found ${flags.length} potential issue${flags.length > 1 ? 's' : ''} in your lease. Please review the original clauses carefully.`;
 }
 
-function getClientIp(req: NextRequest): string {
-  return (
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-    req.headers.get('x-real-ip') ??
-    'unknown'
-  );
+let cachedLawIndexRecords: EmbeddedClauseRecord[] | null = null;
+
+function parseRawLawIndexToEmbeddedRecords(rawIndex: {
+  references: Array<{
+    id: string;
+    kind: string;
+    topic: string;
+    title: string;
+    language: string;
+    ruleIds: string[];
+    text: string;
+    keywords?: string[];
+    sources?: Array<{ label: string; url: string }>;
+    embedding: number[];
+  }>;
+}): EmbeddedClauseRecord[] {
+  return rawIndex.references.map((entry) => ({
+    id: entry.id,
+    source: 'reference',
+    topic: entry.topic as any,
+    heading: entry.title,
+    text: entry.text,
+    embedding: entry.embedding,
+    keywords: entry.keywords,
+    referenceKind: entry.kind as any,
+    metadata: {
+      language: entry.language,
+      ruleIds: entry.ruleIds.join('|'),
+      sourceUrls: (entry.sources ?? []).map((source) => source.url).join('|'),
+      sourceLabels: (entry.sources ?? []).map((source) => source.label).join('|'),
+    },
+  }));
 }
 
-export async function POST(req: NextRequest) {
-  const rateCheck = rateLimiter.check(getClientIp(req));
-  if (!rateCheck.allowed) {
-    const res = NextResponse.json(
-      { error: 'Too many requests. Please try again later.' },
-      { status: 429 },
-    );
-    res.headers.set(
-      'Retry-After',
-      String(Math.ceil((rateCheck.retryAfterMs ?? 60_000) / 1000)),
-    );
-    return res;
+function getLawIndexRecords(): EmbeddedClauseRecord[] {
+  if (!cachedLawIndexRecords) {
+    cachedLawIndexRecords = parseRawLawIndexToEmbeddedRecords(rawLawIndex as any);
   }
+  return cachedLawIndexRecords;
+}
 
-  const formData = await req.formData();
-  const file = formData.get('file');
+export interface AnalyzeLeaseInput {
+  text: string;
+  fileName?: string;
+}
 
-  if (!file || !(file instanceof Blob)) {
-    return NextResponse.json({ error: 'No file provided' }, { status: 400 });
-  }
-
-  if (file.size > MAX_FILE_SIZE) {
-    return NextResponse.json(
-      { error: 'File exceeds the 4.5 MB size limit.' },
-      { status: 413 },
-    );
-  }
-
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  let text: string;
-  try {
-    const parsed = await pdf(buffer);
-    text = parsed.text;
-  } catch {
-    return NextResponse.json({ error: 'Failed to parse PDF' }, { status: 422 });
-  }
-
-  try {
-    await ensureLawClauseIndexRegistered();
-  } catch (error) {
-    console.warn('Failed to load precomputed RAG law index', error);
-  }
+/**
+ * Full RAG semantic clause analysis, executed 100% client-side.
+ */
+export async function analyzeLeaseClientSide({
+  text,
+  fileName,
+}: AnalyzeLeaseInput): Promise<AnalysisResult> {
+  const referenceIndex = getLawIndexRecords();
 
   const scalarExtraction = extractScalarRegexFields(
     {
       text,
-      fileName: 'name' in file && typeof file.name === 'string' ? file.name : undefined,
-      mimeType: file.type || 'application/pdf',
+      fileName,
+      mimeType: 'application/pdf',
     },
     {
       schema: 'be-flanders-residential-v1',
@@ -278,10 +278,12 @@ export async function POST(req: NextRequest) {
       strictness: 'balanced',
     },
   );
+
   const clauseResult = await extractRagClauses({
     text,
-    fileName: 'name' in file && typeof file.name === 'string' ? file.name : undefined,
+    fileName,
     scalarHints: scalarExtraction.fields,
+    referenceIndex,
   });
 
   const mergedFields = mergeFieldMaps(
@@ -292,6 +294,7 @@ export async function POST(req: NextRequest) {
       'document.language': scalarExtraction.fields['document.language'],
     },
   );
+
   const extraction = buildMergedExtractionResult(
     scalarExtraction,
     mergedFields,
@@ -303,16 +306,51 @@ export async function POST(req: NextRequest) {
   const extractedFields = buildFieldSummaries(extraction.fields);
   const extractionMeta = buildExtractionMeta(extraction);
   const documentKind =
-    (extraction.fields['document.kind']?.value as string | null | undefined) ??
-    null;
+    (extraction.fields['document.kind']?.value as string | null | undefined) ?? null;
 
-  const result: AnalysisResult = {
+  return {
     summary: buildSummary(flags, extractionMeta, !text.trim(), documentKind),
     flags,
     explanations,
     extractedFields,
     extraction: extractionMeta,
   };
+}
 
-  return NextResponse.json(result);
+/**
+ * Instant fallback analyzer using regex / scalar parsing without waiting for embeddings.
+ */
+export function analyzeLeaseFast({
+  text,
+  fileName,
+}: AnalyzeLeaseInput): AnalysisResult {
+  const scalarExtraction = extractScalarRegexFields(
+    {
+      text,
+      fileName,
+      mimeType: 'application/pdf',
+    },
+    {
+      schema: 'be-flanders-residential-v1',
+      country: 'BE',
+      region: 'FLANDERS',
+      returnEvidence: true,
+      strictness: 'balanced',
+    },
+  );
+
+  const flags = runRules(scalarExtraction);
+  const explanations = mapExplanations(flags);
+  const extractedFields = buildFieldSummaries(scalarExtraction.fields);
+  const extractionMeta = buildExtractionMeta(scalarExtraction);
+  const documentKind =
+    (scalarExtraction.fields['document.kind']?.value as string | null | undefined) ?? null;
+
+  return {
+    summary: buildSummary(flags, extractionMeta, !text.trim(), documentKind),
+    flags,
+    explanations,
+    extractedFields,
+    extraction: extractionMeta,
+  };
 }

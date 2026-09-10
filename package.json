@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "fixtures:advo-recht": "node scripts/fetch-advo-recht-contracts.mjs",
     "analyze:fixtures": "node scripts/analyze-fixtures.mjs",
@@ -16,6 +16,7 @@
     "franc-min": "^6.2.0",
     "next": "16.2.3",
     "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^4.10.38",
     "react": "^18",
     "react-dom": "^18"
   },

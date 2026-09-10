@@ -6,7 +6,7 @@ The tool extracts fields like deposit amount, notice periods, lease duration, an
 
 The analysis pipeline now also classifies the uploaded document type. If a contract appears to be outside the currently supported Flemish principal-residence residential lease scope, LeaseCheck still extracts fields but skips the legal rule checks and explains that the contract is out of scope.
 
-Nothing is stored. Your PDF is processed in memory and discarded when the request finishes.
+Nothing is stored. Your PDF is processed 100% locally in your browser and is never uploaded to any server.
 
 https://lease-check.vercel.app
 

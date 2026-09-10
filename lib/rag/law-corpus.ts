@@ -319,3 +319,35 @@ export async function getLawCorpus(options: RagLawCorpusOptions = {}): Promise<R
     throw error;
   }
 }
+
+export function parseRawLawIndexToEmbeddedRecords(rawIndex: {
+  references: Array<{
+    id: string;
+    kind: string;
+    topic: string;
+    title: string;
+    language: string;
+    ruleIds: string[];
+    text: string;
+    keywords?: string[];
+    sources?: Array<{ label: string; url: string }>;
+    embedding: number[];
+  }>;
+}): EmbeddedClauseRecord[] {
+  return rawIndex.references.map((entry) => ({
+    id: entry.id,
+    source: 'reference',
+    topic: entry.topic as ClauseTopicId,
+    heading: entry.title,
+    text: entry.text,
+    embedding: entry.embedding,
+    keywords: entry.keywords,
+    referenceKind: entry.kind as ReferenceKind,
+    metadata: {
+      language: entry.language,
+      ruleIds: entry.ruleIds.join('|'),
+      sourceUrls: (entry.sources ?? []).map((source) => source.url).join('|'),
+      sourceLabels: (entry.sources ?? []).map((source) => source.label).join('|'),
+    },
+  }));
+}

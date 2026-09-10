@@ -43,7 +43,7 @@ const TRANSLATION_BLOCK_STYLES: Record<TranslationBlock['type'], string> = {
   paragraph: 'text-sm leading-7 text-gray-700',
 };
 
-const ANALYSIS_ENDPOINT = '/api/analyze-rag';
+import { useRagAnalyzer } from '@/lib/rag/use-rag-analyzer';
 
 async function parseErrorResponse(res: Response): Promise<string> {
   if (res.status === 413) {
@@ -87,6 +87,7 @@ function ScopeWarning({ extraction }: { extraction: ExtractionMeta }) {
 }
 
 export default function Home() {
+  const { analyze } = useRagAnalyzer();
   const [fieldsOpen, setFieldsOpen] = useState(false);
   const [openFlagKey, setOpenFlagKey] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -98,18 +99,6 @@ export default function Home() {
   const [translation, setTranslation] = useState<TranslationResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const isBusy = isAnalyzing || isTranslating;
-
-  async function requestAnalysis(selectedFile: File) {
-    const body = new FormData();
-    body.append('file', selectedFile);
-
-    const res = await fetch(ANALYSIS_ENDPOINT, { method: 'POST', body });
-    if (!res.ok) {
-      throw new Error(await parseErrorResponse(res));
-    }
-
-    return (await res.json()) as AnalysisResult;
-  }
 
   async function requestTranslation(selectedFile: File) {
     const body = new FormData();
@@ -135,7 +124,7 @@ export default function Home() {
     window.gtag?.('event', 'analyze_contract');
 
     try {
-      const analysisResponse = await requestAnalysis(file);
+      const analysisResponse = await analyze(file);
       setResult(analysisResponse);
       if (analysisResponse.flags.length > 0) {
         const firstFlag = analysisResponse.flags[0];
@@ -231,7 +220,7 @@ export default function Home() {
                   Flemish residential or student leases only &middot; 4.5 MB max
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Your file is processed in memory and never stored
+                  🔒 100% Private — processed directly on your device, never uploaded
                 </p>
               </>
             )}

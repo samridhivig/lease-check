@@ -1,7 +1,4 @@
-import path from 'path';
-
 const DEFAULT_EMBEDDING_MODEL_ID = 'Xenova/paraphrase-multilingual-MiniLM-L12-v2';
-const LOCAL_CACHE_DIR = path.join(process.cwd(), '.cache', 'transformers');
 const DEFAULT_POOLING: RagEmbeddingModelMetadata['pooling'] = 'mean';
 const DEFAULT_PREFIX_STRATEGY: RagEmbeddingModelMetadata['prefixStrategy'] = 'none';
 
@@ -18,12 +15,25 @@ type FeatureExtractor = (
   options?: Record<string, unknown>,
 ) => Promise<unknown>;
 
+export type EmbeddingProgressCallback = (data: {
+  status: string;
+  name?: string;
+  file?: string;
+  progress?: number;
+  loaded?: number;
+  total?: number;
+}) => void;
+
 const globalForEmbeddings = globalThis as typeof globalThis & {
   leaseCheckEmbeddingModelId?: string;
   leaseCheckEmbeddingExtractorPromise?: Promise<FeatureExtractor>;
 };
 
-function getTransformersCacheDir(): string {
+function getTransformersCacheDir(): string | undefined {
+  if (typeof process === 'undefined' || !process.env) {
+    return undefined;
+  }
+
   if (process.env.TRANSFORMERS_CACHE) {
     return process.env.TRANSFORMERS_CACHE;
   }
@@ -32,18 +42,21 @@ function getTransformersCacheDir(): string {
     return '/tmp/transformers-cache';
   }
 
-  return LOCAL_CACHE_DIR;
+  return undefined;
 }
 
 function getEmbeddingModelId(): string {
-  return (
-    process.env.RAG_EMBEDDING_MODEL_ID ||
-    process.env.RAG_EMBED_MODEL_ID ||
-    DEFAULT_EMBEDDING_MODEL_ID
-  );
+  if (typeof process !== 'undefined' && process.env) {
+    return (
+      process.env.RAG_EMBEDDING_MODEL_ID ||
+      process.env.RAG_EMBED_MODEL_ID ||
+      DEFAULT_EMBEDDING_MODEL_ID
+    );
+  }
+  return DEFAULT_EMBEDDING_MODEL_ID;
 }
 
-async function getExtractor(): Promise<FeatureExtractor> {
+async function getExtractor(progressCallback?: EmbeddingProgressCallback): Promise<FeatureExtractor> {
   const modelId = getEmbeddingModelId();
   if (
     !globalForEmbeddings.leaseCheckEmbeddingExtractorPromise ||
@@ -52,8 +65,13 @@ async function getExtractor(): Promise<FeatureExtractor> {
     globalForEmbeddings.leaseCheckEmbeddingModelId = modelId;
     globalForEmbeddings.leaseCheckEmbeddingExtractorPromise = (async () => {
       const { env, pipeline } = await import('@huggingface/transformers');
-      env.cacheDir = getTransformersCacheDir();
-      return (await pipeline('feature-extraction', modelId)) as FeatureExtractor;
+      const cacheDir = getTransformersCacheDir();
+      if (cacheDir) {
+        env.cacheDir = cacheDir;
+      }
+      return (await pipeline('feature-extraction', modelId, {
+        progress_callback: progressCallback,
+      })) as FeatureExtractor;
     })();
   }
 
@@ -63,6 +81,12 @@ async function getExtractor(): Promise<FeatureExtractor> {
     globalForEmbeddings.leaseCheckEmbeddingExtractorPromise = undefined;
     throw error;
   }
+}
+
+export async function preloadEmbeddingModel(
+  progressCallback?: EmbeddingProgressCallback,
+): Promise<void> {
+  await getExtractor(progressCallback);
 }
 
 function isNumberMatrix(value: unknown): value is number[][] {

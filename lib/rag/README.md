@@ -1,9 +1,6 @@
-# RAG Clause Analyzer
+# Client-Side RAG Clause Analyzer
 
-This folder contains the production `/api/analyze-rag` pipeline. It stays
-separate from the regex-first fallback analyzer so both approaches can be
-compared on the same fixtures, and so production can switch back quickly if
-needed.
+This folder contains the client-side RAG analysis pipeline running in a background Web Worker. It keeps all processing 100% local inside the user's browser, ensuring zero document leakage and zero serverless compute costs on Vercel.
 
 ## Current flow
 

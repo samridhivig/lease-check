@@ -29,10 +29,11 @@ export interface RagClauseExtractionResult {
   leaseClauses: EmbeddedClauseRecord[];
 }
 
-interface ExtractRagClausesInput {
+export interface ExtractRagClausesInput {
   text: string;
   fileName?: string;
   scalarHints?: Partial<Record<LeaseFieldId, ExtractedValue<unknown>>>;
+  referenceIndex?: EmbeddedClauseRecord[];
 }
 
 const MAX_LEASE_CLAUSES_PER_TOPIC = 1;
@@ -278,12 +279,13 @@ export async function extractRagClauses({
   text,
   fileName,
   scalarHints,
+  referenceIndex: referenceIndexInput,
 }: ExtractRagClausesInput): Promise<RagClauseExtractionResult> {
   const normalizedText = normalizeWhitespace(text);
   const baseLeaseClauses = selectCandidateLeaseClauses(
     consolidateLeaseClauses(buildLeaseClauses(normalizedText)),
   );
-  const referenceIndex = getRegisteredLawClauseIndex();
+  const referenceIndex = referenceIndexInput ?? getRegisteredLawClauseIndex();
   const warnings: string[] = [];
   const clauseBundles: LeaseClauseBundleResult[] = [];
 
