@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { AnalysisResult } from '@/types';
 import { extractTextFromPdf } from '@/lib/client-pdf';
-import { analyzeLeaseClientSide, analyzeLeaseFast } from '@/lib/rag/analyze';
+import { analyzeLeaseFast } from '@/lib/rag/analyze';
 
 export type ModelStatus = 'uninitialized' | 'downloading' | 'ready' | 'fallback_ready';
 
@@ -118,15 +118,7 @@ export function useRagAnalyzer(): UseRagAnalyzerResult {
       }
 
       // Step 3: Direct fallback on main thread
-      try {
-        if (modelStatus === 'ready') {
-          return await analyzeLeaseClientSide({ text, fileName: file.name });
-        }
-        return analyzeLeaseFast({ text, fileName: file.name });
-      } catch (err) {
-        console.warn('Semantic analysis failed on main thread, falling back to fast analyzer', err);
-        return analyzeLeaseFast({ text, fileName: file.name });
-      }
+      return analyzeLeaseFast({ text, fileName: file.name });
     },
     [modelStatus],
   );

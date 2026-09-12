@@ -64,10 +64,14 @@ async function getExtractor(progressCallback?: EmbeddingProgressCallback): Promi
   ) {
     globalForEmbeddings.leaseCheckEmbeddingModelId = modelId;
     globalForEmbeddings.leaseCheckEmbeddingExtractorPromise = (async () => {
-      const { env, pipeline } = await import('@huggingface/transformers');
-      const cacheDir = getTransformersCacheDir();
-      if (cacheDir) {
-        env.cacheDir = cacheDir;
+      // In the browser/worker, dynamically import Transformers.js from CDN so Vercel does not bundle onnxruntime-node
+      const { env, pipeline } = (await import(
+        /* webpackIgnore: true */
+        // @ts-ignore
+        'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3'
+      )) as any;
+      if (env) {
+        env.allowLocalModels = false;
       }
       return (await pipeline('feature-extraction', modelId, {
         progress_callback: progressCallback,

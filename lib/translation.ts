@@ -59,22 +59,7 @@ const globalForTranslation = globalThis as typeof globalThis & {
 };
 
 async function getDutchTranslator(): Promise<DutchTranslator> {
-  if (!globalForTranslation.dutchTranslatorPromise) {
-    globalForTranslation.dutchTranslatorPromise = (async () => {
-      const { env, pipeline } = await import('@huggingface/transformers');
-
-      env.cacheDir = getTransformersCacheDir();
-
-      return (await pipeline('translation', DUTCH_MODEL_ID)) as DutchTranslator;
-    })();
-  }
-
-  try {
-    return await globalForTranslation.dutchTranslatorPromise;
-  } catch (error) {
-    globalForTranslation.dutchTranslatorPromise = undefined;
-    throw error;
-  }
+  throw new Error('Translation functionality is currently disabled.');
 }
 
 function normalizeText(text: string): string {
